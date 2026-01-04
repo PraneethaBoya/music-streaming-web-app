@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const multer = require('multer');
 require('dotenv').config();
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (frontend)
 app.use(express.static(path.join(__dirname)));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database connection
 const { Pool } = require('pg');
@@ -47,6 +50,27 @@ function ensureDb(res) {
   return true;
 }
 
+const uploadsRoot = path.join(__dirname, 'uploads');
+const audioUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dest = path.join(uploadsRoot, 'audio');
+      fs.mkdirSync(dest, { recursive: true });
+      cb(null, dest);
+    },
+    filename: (req, file, cb) => {
+      const safe = `${Date.now()}-${file.originalname}`.replace(/[^a-zA-Z0-9._-]/g, '_');
+      cb(null, safe);
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    const allowed = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-wav']);
+    if (allowed.has(file.mimetype)) return cb(null, true);
+    cb(new Error('Unsupported audio type. Please upload MP3 (MPEG), WAV, or OGG.'));
+  },
+  limits: { fileSize: 25 * 1024 * 1024 }
+});
+
 // Test database connection
 if (pool) {
   pool.on('connect', () => {
@@ -67,6 +91,19 @@ if (pool) {
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', message: 'Server is running' });
+});
+
+app.post('/api/upload/audio', (req, res) => {
+  audioUpload.single('file')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'Upload failed' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file uploaded' });
+    }
+    const urlPath = `/uploads/audio/${req.file.filename}`;
+    res.status(201).json({ message: 'Upload successful', file: { url: urlPath, mime: req.file.mimetype, name: req.file.originalname } });
+  });
 });
 
 // ============================================
