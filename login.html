@@ -42,11 +42,10 @@
   <script>
     // Initialize login page when DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, initializing login page...');
       if (typeof initLoginPage === 'function') {
         initLoginPage();
       } else {
-        console.error('initLoginPage function not found!');
+        console.error('initLoginPage function not found');
       }
     });
     
@@ -55,7 +54,6 @@
       // DOM is still loading, wait for DOMContentLoaded
     } else {
       // DOM is already loaded
-      console.log('DOM already loaded, initializing immediately...');
       if (typeof initLoginPage === 'function') {
         initLoginPage();
       }

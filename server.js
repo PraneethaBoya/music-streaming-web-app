@@ -11,6 +11,7 @@ require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Middleware
 app.use(cors());
@@ -49,14 +50,14 @@ function ensureDb(res) {
 // Test database connection
 if (pool) {
   pool.on('connect', () => {
-    console.log('✅ Connected to PostgreSQL database');
+    if (!IS_PRODUCTION) console.log('Connected to PostgreSQL database');
   });
 
   pool.on('error', (err) => {
     console.error('❌ Database connection error:', err);
   });
 } else {
-  console.warn('⚠️ DATABASE_URL not set; running in local JSON mode (no PostgreSQL)');
+  if (!IS_PRODUCTION) console.warn('DATABASE_URL not set; running in local JSON mode (no PostgreSQL)');
 }
 
 // ============================================
@@ -264,7 +265,9 @@ app.get('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📡 Environment: ${process.env.NODE_ENV || 'development'}`);
+  if (!IS_PRODUCTION) {
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  }
 });
 

@@ -28,8 +28,6 @@ function isLoggedIn() {
  * Login function
  */
 function handleLogin() {
-  console.log('handleLogin called');
-  
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');
   const errorDiv = document.getElementById('login-error');
@@ -42,14 +40,11 @@ function handleLogin() {
   const email = emailInput.value.trim();
   const password = passwordInput.value;
   
-  console.log('Login attempt - Email:', email, 'Password length:', password.length);
-  
   // Clear previous errors
   clearError();
   
   // Validation
   if (!email || !password) {
-    console.log('Validation failed: empty fields');
     showError('Please enter both email and password');
     highlightError(emailInput, passwordInput);
     return;
@@ -69,7 +64,6 @@ function handleLogin() {
       }
 
       setAuthSession(data.token, data.user);
-      console.log('✓ Login successful, redirecting to home...');
       window.location.href = 'home.html';
     })
     .catch((err) => {
@@ -220,17 +214,12 @@ function highlightError(...inputs) {
  * Initialize login page
  */
 function initLoginPage() {
-  console.log('Initializing login page...');
-  
   const loginForm = document.getElementById('login-form');
   if (loginForm) {
-    console.log('Login form found');
-    
     // Prevent form submission
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log('Form submit prevented, calling handleLogin...');
       handleLogin();
       return false;
     });
@@ -240,7 +229,6 @@ function initLoginPage() {
     if (submitBtn) {
       submitBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('Submit button clicked');
         handleLogin();
         return false;
       });
@@ -335,16 +323,6 @@ function showForgotPasswordModal() {
     };
     localStorage.setItem('resetCode', JSON.stringify(resetData));
     
-    // Log reset code to console (simulating email)
-    console.log('========================================');
-    console.log('📧 RESET CODE EMAIL (Simulated)');
-    console.log('========================================');
-    console.log('To: ' + email);
-    console.log('Subject: Password Reset Code');
-    console.log('Your reset code is: ' + resetCode);
-    console.log('This code expires in 10 minutes.');
-    console.log('========================================');
-    
     // Show success message
     messageDiv.innerHTML = `
       <div class="success-message">
@@ -358,7 +336,7 @@ function showForgotPasswordModal() {
             ${resetCode}
           </div>
           <div style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-bottom: var(--spacing-md);">
-            (Check console for simulated email)
+            Keep this code safe. It expires in 10 minutes.
           </div>
           <a href="reset-password.html" class="btn btn-primary" style="display: inline-block; margin-top: var(--spacing-md);">Continue to Reset Password</a>
         </div>
