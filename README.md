@@ -158,11 +158,9 @@ NODE_ENV=production
 ISC
 
 ## 👤 Author
-
-Your Name
+Praneetha
 
 ## 🙏 Acknowledgments
 
 - Icons and images from Unsplash
 - Audio samples from SoundHelix
-
