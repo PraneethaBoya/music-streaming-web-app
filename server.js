@@ -64,8 +64,27 @@ const audioUpload = multer({
     }
   }),
   fileFilter: (req, file, cb) => {
-    const allowed = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-wav']);
-    if (allowed.has(file.mimetype)) return cb(null, true);
+    const mime = String(file.mimetype || '').toLowerCase();
+    const ext = path.extname(file.originalname || '').toLowerCase();
+
+    const allowedMimes = new Set([
+      'audio/mpeg',
+      'audio/mp3',
+      'audio/wav',
+      'audio/x-wav',
+      'audio/wave',
+      'audio/ogg',
+      'audio/opus'
+    ]);
+
+    const allowedExts = new Set(['.mp3', '.mpeg', '.wav', '.ogg', '.opus']);
+
+    // Some environments/browsers send audio files as application/octet-stream.
+    // Accept known audio extensions as a fallback.
+    if (allowedMimes.has(mime) || (mime.startsWith('audio/') && mime.length > 6) || allowedExts.has(ext)) {
+      return cb(null, true);
+    }
+
     cb(new Error('Unsupported audio type. Please upload MP3 (MPEG), WAV, or OGG.'));
   },
   limits: { fileSize: 25 * 1024 * 1024 }
