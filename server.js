@@ -22,7 +22,13 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files (frontend)
 app.use(express.static(path.join(__dirname)));
 
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { fallthrough: false }));
+
+app.use('/uploads', (err, req, res, next) => {
+  if (!err) return next();
+  const status = err.status || err.statusCode || 404;
+  res.status(status).send('Not Found');
+});
 
 // Database connection
 const { Pool } = require('pg');
@@ -485,7 +491,7 @@ app.get('/api/playlists', async (req, res) => {
 // ============================================
 
 // Serve index.html for all routes (SPA)
-app.get('*', (req, res) => {
+app.get(/^\/(?!api\/|uploads\/).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
