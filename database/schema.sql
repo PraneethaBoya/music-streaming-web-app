@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS artists (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_artists_name_unique ON artists(name);
+
 -- Albums Table
 CREATE TABLE IF NOT EXISTS albums (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

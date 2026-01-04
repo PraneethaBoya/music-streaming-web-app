@@ -133,6 +133,10 @@
     (function () {
       const form = document.getElementById('upload-form');
       const fileInput = document.getElementById('song-file');
+      const titleInput = document.getElementById('song-title');
+      const artistInput = document.getElementById('artist-name');
+      const albumInput = document.getElementById('album-name');
+      const coverInput = document.getElementById('cover-image');
       if (!form || !fileInput) return;
 
       const apiBaseUrl = (typeof window !== 'undefined' && window.API_BASE_URL)
@@ -148,20 +152,38 @@
           return;
         }
 
+        const title = titleInput ? titleInput.value.trim() : '';
+        const artist = artistInput ? artistInput.value.trim() : '';
+        const album = albumInput ? albumInput.value.trim() : '';
+        if (!title || !artist) {
+          alert('Please enter both song title and artist name.');
+          return;
+        }
+
         const fd = new FormData();
         fd.append('file', file);
+        fd.append('title', title);
+        fd.append('artist', artist);
+        if (album) fd.append('album', album);
+
+        const cover = coverInput && coverInput.files && coverInput.files[0];
+        if (cover) fd.append('cover', cover);
 
         try {
-          const res = await fetch(`${apiBaseUrl}/upload/audio`, {
+          const res = await fetch(`${apiBaseUrl}/upload/song`, {
             method: 'POST',
             body: fd
           });
           const data = await res.json().catch(() => null);
           if (!res.ok) throw new Error(data?.error || 'Upload failed');
 
-          const url = data?.file?.url;
-          alert(url ? `Upload successful! File URL: ${url}` : 'Upload successful!');
+          alert('Upload successful! Redirecting to Home...');
           fileInput.value = '';
+          if (titleInput) titleInput.value = '';
+          if (artistInput) artistInput.value = '';
+          if (albumInput) albumInput.value = '';
+          if (coverInput) coverInput.value = '';
+          window.location.href = 'home.html';
         } catch (err) {
           alert(err?.message || 'Upload failed');
         }

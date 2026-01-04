@@ -90,6 +90,26 @@ const audioUpload = multer({
   limits: { fileSize: 25 * 1024 * 1024 }
 });
 
+const coverUpload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dest = path.join(uploadsRoot, 'covers');
+      fs.mkdirSync(dest, { recursive: true });
+      cb(null, dest);
+    },
+    filename: (req, file, cb) => {
+      const safe = `${Date.now()}-${file.originalname}`.replace(/[^a-zA-Z0-9._-]/g, '_');
+      cb(null, safe);
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    const mime = String(file.mimetype || '').toLowerCase();
+    if (mime.startsWith('image/')) return cb(null, true);
+    cb(new Error('Unsupported cover image type. Please upload an image file.'));
+  },
+  limits: { fileSize: 5 * 1024 * 1024 }
+});
+
 // Test database connection
 if (pool) {
   pool.on('connect', () => {
@@ -122,6 +142,93 @@ app.post('/api/upload/audio', (req, res) => {
     }
     const urlPath = `/uploads/audio/${req.file.filename}`;
     res.status(201).json({ message: 'Upload successful', file: { url: urlPath, mime: req.file.mimetype, name: req.file.originalname } });
+  });
+});
+
+app.post('/api/upload/song', (req, res) => {
+  if (!ensureDb(res)) return;
+
+  const upload = multer().none();
+  upload(req, res, (parseErr) => {
+    if (parseErr) {
+      return res.status(400).json({ error: 'Invalid form data' });
+    }
+
+    const { title, artist, album } = req.body || {};
+    if (!title || !artist) {
+      return res.status(400).json({ error: 'Song title and artist are required' });
+    }
+
+    audioUpload.single('file')(req, res, async (audioErr) => {
+      if (audioErr) {
+        return res.status(400).json({ error: audioErr.message || 'Audio upload failed' });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: 'No audio file uploaded' });
+      }
+
+      const audioUrl = `/uploads/audio/${req.file.filename}`;
+
+      coverUpload.single('cover')(req, res, async (coverErr) => {
+        if (coverErr) {
+          return res.status(400).json({ error: coverErr.message || 'Cover upload failed' });
+        }
+
+        const coverUrl = req.file && req.file.fieldname === 'cover'
+          ? `/uploads/covers/${req.file.filename}`
+          : null;
+
+        try {
+          const artistName = String(artist).trim();
+          const albumTitle = album ? String(album).trim() : '';
+
+          const artistResult = await pool.query(
+            'INSERT INTO artists (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name',
+            [artistName]
+          );
+          const artistRow = artistResult.rows[0];
+
+          let albumId = null;
+          if (albumTitle) {
+            const existingAlbum = await pool.query(
+              'SELECT id, title FROM albums WHERE title = $1 AND artist_id = $2 LIMIT 1',
+              [albumTitle, artistRow.id]
+            );
+            if (existingAlbum.rows.length > 0) {
+              albumId = existingAlbum.rows[0].id;
+            } else {
+              const createdAlbum = await pool.query(
+                'INSERT INTO albums (title, artist_id) VALUES ($1, $2) RETURNING id, title',
+                [albumTitle, artistRow.id]
+              );
+              albumId = createdAlbum.rows[0].id;
+            }
+          }
+
+          const songResult = await pool.query(
+            'INSERT INTO songs (title, artist_id, album_id, audio_url, cover_url, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, title, audio_url, cover_url',
+            [String(title).trim(), artistRow.id, albumId, audioUrl, coverUrl]
+          );
+
+          const songRow = songResult.rows[0];
+          res.status(201).json({
+            message: 'Song uploaded successfully',
+            song: {
+              id: songRow.id,
+              title: songRow.title,
+              artist: artistRow.name,
+              album: albumTitle || '',
+              duration: null,
+              cover: songRow.cover_url,
+              audio: songRow.audio_url
+            }
+          });
+        } catch (e) {
+          console.error('Error saving uploaded song:', e);
+          res.status(500).json({ error: 'Failed to save song metadata' });
+        }
+      });
+    });
   });
 });
 
@@ -254,7 +361,20 @@ app.get('/api/songs', async (req, res) => {
       return;
     }
 
-    const result = await pool.query('SELECT * FROM songs ORDER BY created_at DESC');
+    const result = await pool.query(
+      `SELECT
+        s.id,
+        s.title,
+        a.name AS artist,
+        al.title AS album,
+        s.duration,
+        s.cover_url AS cover,
+        s.audio_url AS audio
+      FROM songs s
+      LEFT JOIN artists a ON a.id = s.artist_id
+      LEFT JOIN albums al ON al.id = s.album_id
+      ORDER BY s.created_at DESC`
+    );
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching songs:', error);
@@ -275,7 +395,21 @@ app.get('/api/songs/:id', async (req, res) => {
       return;
     }
 
-    const result = await pool.query('SELECT * FROM songs WHERE id = $1', [id]);
+    const result = await pool.query(
+      `SELECT
+        s.id,
+        s.title,
+        a.name AS artist,
+        al.title AS album,
+        s.duration,
+        s.cover_url AS cover,
+        s.audio_url AS audio
+      FROM songs s
+      LEFT JOIN artists a ON a.id = s.artist_id
+      LEFT JOIN albums al ON al.id = s.album_id
+      WHERE s.id = $1`,
+      [id]
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Song not found' });

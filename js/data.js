@@ -18,6 +18,31 @@ class DataManager {
     }
 
     try {
+      const apiBaseUrl = (typeof window !== 'undefined' && window.API_BASE_URL)
+        ? window.API_BASE_URL
+        : `${window.location.origin}/api`;
+
+      const apiRes = await fetch(`${apiBaseUrl}/songs`).catch(() => null);
+      if (apiRes && apiRes.ok) {
+        const songs = await apiRes.json();
+        this.data = {
+          songs: Array.isArray(songs) ? songs.map(s => ({
+            id: s.id,
+            title: s.title,
+            artist: s.artist || '',
+            album: s.album || '',
+            duration: s.duration || null,
+            cover: s.cover || s.cover_url || null,
+            audio: s.audio || s.audio_url || null
+          })) : [],
+          artists: [],
+          albums: [],
+          playlists: []
+        };
+        this.loaded = true;
+        return this.data;
+      }
+
       const response = await fetch('./data.json');
       this.data = await response.json();
       this.loaded = true;
