@@ -77,7 +77,7 @@ const audioUpload = multer({
       'audio/opus'
     ]);
 
-    const allowedExts = new Set(['.mp3', '.mpeg', '.wav', '.ogg', '.opus']);
+    const allowedExts = new Set(['.mp3', '.wav', '.ogg', '.opus']);
 
     // Some environments/browsers send audio files as application/octet-stream.
     // Accept known audio extensions as a fallback.
@@ -142,7 +142,7 @@ const uploadSong = multer({
       'audio/ogg',
       'audio/opus'
     ]);
-    const allowedExts = new Set(['.mp3', '.mpeg', '.wav', '.ogg', '.opus']);
+    const allowedExts = new Set(['.mp3', '.wav', '.ogg', '.opus']);
 
     if (allowedMimes.has(mime) || (mime.startsWith('audio/') && mime.length > 6) || allowedExts.has(ext)) {
       return cb(null, true);
