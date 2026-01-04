@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - MusicStream</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card fade-in">
+      <h1>Welcome Back</h1>
+      <p>Login to continue to MusicStream</p>
+      <form id="login-form" method="post" onsubmit="return false;">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+        </div>
+        <div class="form-group" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+          <label style="margin: 0; display: flex; align-items: center; gap: var(--spacing-xs);">
+            <input type="checkbox" id="remember-me" style="width: auto;">
+            <span style="font-size: var(--font-size-sm);">Remember me</span>
+          </label>
+          <a href="#" id="forgot-password-link" class="gradient-primary" style="font-size: var(--font-size-sm);">Forgot password?</a>
+        </div>
+        <div id="login-error" class="error-message" style="display: none;"></div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
+      </form>
+      <div class="auth-link">
+        Don't have an account? <a href="signup.html">Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Initialize login page when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing login page...');
+      if (typeof initLoginPage === 'function') {
+        initLoginPage();
+      } else {
+        console.error('initLoginPage function not found!');
+      }
+    });
+    
+    // Also try to initialize immediately if DOM is already loaded
+    if (document.readyState === 'loading') {
+      // DOM is still loading, wait for DOMContentLoaded
+    } else {
+      // DOM is already loaded
+      console.log('DOM already loaded, initializing immediately...');
+      if (typeof initLoginPage === 'function') {
+        initLoginPage();
+      }
+    }
+  </script>
+</body>
+</html>
+

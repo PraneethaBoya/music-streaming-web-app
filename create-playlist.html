@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Playlist - MusicStream</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>MusicStream</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item"><i class="icon-home"></i> Home</a>
+        <a href="search.html" class="nav-item"><i class="icon-search"></i> Search</a>
+        <a href="library.html" class="nav-item"><i class="icon-library"></i> Your Library</a>
+        <a href="create-playlist.html" class="nav-item active"><i class="icon-playlist"></i> Create Playlist</a>
+        <a href="liked-songs.html" class="nav-item"><i class="icon-liked"></i> Liked Songs</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="upload.html" class="nav-item"><i class="icon-upload"></i> Upload Song</a>
+        <a href="create-album.html" class="nav-item"><i class="icon-album"></i> Create Album</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-nav">
+        <div class="search-bar">
+          <input type="text" placeholder="Search for songs, artists, albums..." id="search-input">
+        </div>
+        <div class="profile">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=40&h=40&fit=crop" alt="Profile" class="profile-img">
+        </div>
+      </header>
+
+      <section class="content-section">
+        <h1>Create Playlist</h1>
+        <p style="color: var(--text-secondary); margin-bottom: var(--spacing-xl);">Build your perfect playlist</p>
+
+        <div class="card" style="max-width: 600px; margin: 0 auto;">
+          <form id="create-playlist-form">
+            <div class="form-group">
+              <label for="playlist-name">Playlist Name</label>
+              <input type="text" id="playlist-name" name="name" placeholder="Enter playlist name" required>
+            </div>
+            <div class="form-group">
+              <label for="playlist-description">Description (Optional)</label>
+              <textarea id="playlist-description" name="description" placeholder="Describe your playlist" rows="3" style="width: 100%; padding: var(--spacing-md); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: var(--font-size-base); font-family: inherit; resize: vertical;"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="playlist-cover">Cover Image URL (Optional)</label>
+              <input type="url" id="playlist-cover" name="cover" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="form-group">
+              <label for="playlist-songs-select">Select Songs</label>
+              <select id="playlist-songs-select" name="songs" multiple style="width: 100%; padding: var(--spacing-md); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: var(--font-size-base); font-family: inherit; min-height: 120px;">
+                <option value="" disabled>Select songs for your playlist (Hold Ctrl/Cmd to select multiple)</option>
+              </select>
+              <small style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: block;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple songs</small>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-md);">Create Playlist</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="player-bar">
+    <div class="player-now-playing">
+      <img src="" alt="Now Playing" class="player-now-playing-image" id="player-now-playing-image" style="display: none;">
+      <div class="player-now-playing-info" style="display: none;">
+        <div class="player-now-playing-title" id="player-now-playing-title">Not playing</div>
+        <div class="player-now-playing-artist" id="player-now-playing-artist">Select a song to play</div>
+      </div>
+    </div>
+    
+    <div class="player-controls">
+      <div class="player-controls-main">
+        <button class="player-btn" id="shuffle-btn" title="Shuffle">
+          <i class="icon-shuffle"></i>
+        </button>
+        <button class="player-btn" id="prev-btn" title="Previous">
+          <i class="icon-prev"></i>
+        </button>
+        <button class="player-btn play-pause" id="play-btn" title="Play">
+          <i class="icon-play"></i>
+        </button>
+        <button class="player-btn" id="next-btn" title="Next">
+          <i class="icon-next"></i>
+        </button>
+        <button class="player-btn" id="repeat-btn" title="Repeat">
+          <i class="icon-repeat"></i>
+        </button>
+      </div>
+      <div class="player-progress-container">
+        <span class="player-progress-time" id="player-current-time">0:00</span>
+        <div class="player-progress-bar" id="player-progress-bar">
+          <div class="player-progress-fill" id="player-progress-fill"></div>
+        </div>
+        <span class="player-progress-time" id="player-duration">0:00</span>
+      </div>
+    </div>
+    
+    <div class="player-volume">
+      <button class="player-volume-btn" id="volume-btn" title="Volume">
+        <i class="icon-volume">🔊</i>
+      </button>
+      <div class="player-volume-slider" id="volume-slider-container">
+        <div class="player-volume-fill" id="player-volume-fill"></div>
+      </div>
+      <input type="range" id="volume-slider" min="0" max="100" value="50" style="display: none;">
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/likes.js"></script>
+  <script src="js/playlist-manager.js"></script>
+  <script src="js/tracking.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // Load songs for selection
+    document.addEventListener('DOMContentLoaded', async () => {
+      await dataManager.loadData();
+      const songs = dataManager.getSongs();
+      const select = document.getElementById('playlist-songs-select');
+      
+      if (select) {
+        songs.forEach(song => {
+          const option = document.createElement('option');
+          option.value = song.id;
+          option.textContent = `${song.title} - ${song.artist}`;
+          select.appendChild(option);
+        });
+      }
+    });
+
+    // Handle form submission
+    document.getElementById('create-playlist-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const playlistName = formData.get('name');
+      const description = formData.get('description') || '';
+      const selectedSongs = Array.from(document.getElementById('playlist-songs-select').selectedOptions)
+        .map(opt => parseInt(opt.value));
+      
+      // Create playlist using playlist manager
+      const playlist = playlistManager.createPlaylist(playlistName, description, '', selectedSongs);
+      
+      alert(`Playlist "${playlistName}" created successfully with ${selectedSongs.length} songs!`);
+      
+      // Redirect to library
+      window.location.href = 'library.html';
+    });
+  </script>
+</body>
+</html>
+

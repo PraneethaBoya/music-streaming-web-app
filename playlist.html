@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Playlist - MusicStream</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>MusicStream</h2>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="home.html" class="nav-item"><i class="icon-home"></i> Home</a>
+        <a href="search.html" class="nav-item"><i class="icon-search"></i> Search</a>
+        <a href="library.html" class="nav-item"><i class="icon-library"></i> Your Library</a>
+        <a href="create-playlist.html" class="nav-item"><i class="icon-playlist"></i> Create Playlist</a>
+        <a href="liked-songs.html" class="nav-item"><i class="icon-liked"></i> Liked Songs</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="upload.html" class="nav-item"><i class="icon-upload"></i> Upload Song</a>
+        <a href="create-album.html" class="nav-item"><i class="icon-album"></i> Create Album</a>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-nav">
+        <div class="search-bar">
+          <input type="text" placeholder="Search for songs, artists, albums..." id="search-input">
+        </div>
+        <div class="profile">
+          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=40&h=40&fit=crop" alt="Profile" class="profile-img">
+        </div>
+      </header>
+
+      <section class="content-section">
+        <div class="playlist-header">
+          <img src="" alt="Playlist" class="playlist-header-image" id="playlist-header-image">
+          <div class="playlist-header-info">
+            <div class="playlist-header-type">Playlist</div>
+            <h1 class="playlist-header-title" id="playlist-header-title">Loading...</h1>
+            <p class="playlist-header-description" id="playlist-header-description"></p>
+            <div class="playlist-header-meta" id="playlist-header-meta"></div>
+          </div>
+        </div>
+
+        <div class="playlist-actions">
+          <button class="btn btn-primary play-pause" id="play-playlist-btn" style="width: 56px; height: 56px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: var(--font-size-xl);">
+            <i class="icon-play"></i>
+          </button>
+        </div>
+
+        <div class="song-list" id="playlist-songs">
+          <div class="loading">Loading...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="player-bar">
+    <div class="player-now-playing">
+      <img src="" alt="Now Playing" class="player-now-playing-image" id="player-now-playing-image" style="display: none;">
+      <div class="player-now-playing-info" style="display: none;">
+        <div class="player-now-playing-title" id="player-now-playing-title">Not playing</div>
+        <div class="player-now-playing-artist" id="player-now-playing-artist">Select a song to play</div>
+      </div>
+    </div>
+    
+    <div class="player-controls">
+      <div class="player-controls-main">
+        <button class="player-btn" id="shuffle-btn" title="Shuffle">
+          <i class="icon-shuffle"></i>
+        </button>
+        <button class="player-btn" id="prev-btn" title="Previous">
+          <i class="icon-prev"></i>
+        </button>
+        <button class="player-btn play-pause" id="play-btn" title="Play">
+          <i class="icon-play"></i>
+        </button>
+        <button class="player-btn" id="next-btn" title="Next">
+          <i class="icon-next"></i>
+        </button>
+        <button class="player-btn" id="repeat-btn" title="Repeat">
+          <i class="icon-repeat"></i>
+        </button>
+      </div>
+      <div class="player-progress-container">
+        <span class="player-progress-time" id="player-current-time">0:00</span>
+        <div class="player-progress-bar" id="player-progress-bar">
+          <div class="player-progress-fill" id="player-progress-fill"></div>
+        </div>
+        <span class="player-progress-time" id="player-duration">0:00</span>
+      </div>
+    </div>
+    
+    <div class="player-volume">
+      <button class="player-volume-btn" id="volume-btn" title="Volume">
+        <i class="icon-volume">🔊</i>
+      </button>
+      <div class="player-volume-slider" id="volume-slider-container">
+        <div class="player-volume-fill" id="player-volume-fill"></div>
+      </div>
+      <input type="range" id="volume-slider" min="0" max="100" value="50" style="display: none;">
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/likes.js"></script>
+  <script src="js/playlist-manager.js"></script>
+  <script src="js/tracking.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+
