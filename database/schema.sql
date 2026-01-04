@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS playlist_songs (
     song_id UUID REFERENCES songs(id) ON DELETE CASCADE,
     position INTEGER,
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (playlist_id, song_id)
+    UNIQUE (playlist_id, song_id)
 );
 
 -- Liked Songs (User favorites)
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS liked_songs (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     song_id UUID REFERENCES songs(id) ON DELETE CASCADE,
     liked_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, song_id)
+    UNIQUE (user_id, song_id)
 );
 
 -- Recently Played
