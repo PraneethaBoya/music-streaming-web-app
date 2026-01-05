@@ -238,12 +238,8 @@ app.post('/api/admin/reset-seed', async (req, res) => {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    // Wipe in dependency order
-    await pool.query('DELETE FROM playlist_songs');
-    await pool.query('DELETE FROM playlists');
-    await pool.query('DELETE FROM songs');
-    await pool.query('DELETE FROM albums');
-    await pool.query('DELETE FROM artists');
+    // Strict wipe (guarantee empty DB)
+    await pool.query('TRUNCATE TABLE playlist_songs, playlists, songs, albums, artists CASCADE');
     res.json({
       ok: true,
       artists: 0,
