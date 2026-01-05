@@ -1771,14 +1771,14 @@ img {
 
  .sonic-waves {
    position: relative;
-   width: min(70%, 280px);
-   height: 56px;
+   width: min(76vw, 360px);
+   height: 72px;
    margin-top: 12px;
    z-index: 3;
    opacity: 0;
    pointer-events: none;
    display: block;
-   background: rgba(0, 0, 0, 0.35);
+   background: rgba(0, 0, 0, 0.45);
    border: 1px solid rgba(255, 255, 255, 0.14);
    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
    border-radius: 14px;
