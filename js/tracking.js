@@ -101,9 +101,10 @@ class TrackingManager {
     // Convert to array and sort
     const songs = Object.entries(playCounts)
       .map(([songId, count]) => ({
-        id: parseInt(songId),
+        id: songId != null ? String(songId) : '',
         count: count
       }))
+      .filter(item => item.id && item.id.trim() !== '')
       .sort((a, b) => b.count - a.count)
       .slice(0, limit)
       .map(item => item.id);

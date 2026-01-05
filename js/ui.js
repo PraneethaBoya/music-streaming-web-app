@@ -255,7 +255,7 @@ class UIManager {
     container.querySelectorAll('.play-playlist-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const playlistId = parseInt(btn.getAttribute('data-playlist-id'));
+        const playlistId = btn.getAttribute('data-playlist-id');
         this.playPlaylist(playlistId);
       });
     });
@@ -263,7 +263,7 @@ class UIManager {
     container.querySelectorAll('[data-playlist-id]').forEach(card => {
       card.addEventListener('click', (e) => {
         if (!e.target.closest('.play-overlay')) {
-          const playlistId = parseInt(card.getAttribute('data-playlist-id'));
+          const playlistId = card.getAttribute('data-playlist-id');
           window.location.href = `playlist.html?id=${playlistId}`;
         }
       });

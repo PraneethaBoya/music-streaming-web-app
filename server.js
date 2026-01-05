@@ -819,6 +819,25 @@ app.get(/^\/(?!api\/|uploads\/).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// API 404 handler
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'Not Found' });
+});
+
+// Central error handler
+app.use((err, req, res, next) => {
+  const status = err?.status || err?.statusCode || 500;
+
+  if (!IS_PRODUCTION) {
+    console.error('Unhandled error:', err);
+  }
+
+  if (res.headersSent) return next(err);
+  res.status(status).json({
+    error: status >= 500 ? 'Internal server error' : (err?.message || 'Request failed')
+  });
+});
+
 // Start server
 app.listen(PORT, () => {
   if (!IS_PRODUCTION) {

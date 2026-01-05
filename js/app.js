@@ -179,7 +179,7 @@ async function initHomePage() {
 async function initPlaylistPage() {
   // Get playlist ID from URL
   const urlParams = new URLSearchParams(window.location.search);
-  const playlistId = parseInt(urlParams.get('id'));
+  const playlistId = urlParams.get('id');
 
   if (!playlistId) {
     window.location.href = 'home.html';
