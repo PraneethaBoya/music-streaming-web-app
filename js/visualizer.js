@@ -25,6 +25,8 @@ class AudioVisualizer {
     this.rms = 0;
     this.energy = 0;
     this.beat = 0;
+
+    this.barHeights = [];
     
     // Sonic wave settings
     this.waveLayers = [
@@ -388,12 +390,15 @@ class AudioVisualizer {
     const softAlpha = this.alpha;
     const glowBoost = 1 + (this.beat * 2.0);
 
-    // Smooth, modern waveform (time-domain driven)
+    // Spotify-style barcode pill (vertical rounded bars)
     const len = this.dataArray && this.dataArray.length ? this.dataArray.length : 0;
     if (len === 0) return;
 
-    const amp = Math.max(2, (height * 0.22) + (height * 0.38) * intensity);
-    const step = 2;
+    const barCount = Math.max(34, Math.min(80, Math.floor(width / 7)));
+    const gap = 2;
+    const barW = Math.max(2, Math.floor((width - (barCount - 1) * gap) / barCount));
+    const minH = Math.max(3, height * 0.12);
+    const maxH = height * 0.92;
 
     const gradient = ctx.createLinearGradient(0, 0, width, 0);
     gradient.addColorStop(0, `rgba(26, 140, 255, ${0.95 * softAlpha})`);  // Neon Blue
@@ -402,37 +407,45 @@ class AudioVisualizer {
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 0.95 * softAlpha;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    // Outer glow stroke
     ctx.strokeStyle = gradient;
-    ctx.lineWidth = 5;
-    ctx.shadowBlur = 26 * glowBoost;
-    ctx.shadowColor = `rgba(0, 229, 255, ${0.45 * softAlpha})`;
-    ctx.beginPath();
-    for (let x = 0; x <= width; x += step) {
-      const idx = Math.floor((x / width) * (len - 1));
-      const v = (this.dataArray[idx] - 128) / 128;
-      const y = centerY + v * amp;
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
-    }
-    ctx.stroke();
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 18 * glowBoost;
+    ctx.shadowColor = `rgba(0, 229, 255, ${0.42 * softAlpha})`;
 
-    // Crisp inner stroke for definition
-    ctx.shadowBlur = 10 * glowBoost;
-    ctx.shadowColor = `rgba(168, 85, 247, ${0.35 * softAlpha})`;
-    ctx.lineWidth = 2.2;
-    ctx.beginPath();
-    for (let x = 0; x <= width; x += step) {
-      const idx = Math.floor((x / width) * (len - 1));
-      const v = (this.dataArray[idx] - 128) / 128;
-      const y = centerY + v * amp;
-      if (x === 0) ctx.moveTo(x, y);
-      else ctx.lineTo(x, y);
+    // Ensure persistent smoothing buffer
+    if (!Array.isArray(this.barHeights) || this.barHeights.length !== barCount) {
+      this.barHeights = new Array(barCount).fill(minH);
     }
-    ctx.stroke();
+
+    const energyBoost = 0.55 + this.energy * 0.9;
+    const smoothing = 0.22; // higher = snappier, lower = smoother
+
+    for (let i = 0; i < barCount; i++) {
+      // Map each bar to a slice of the time-domain signal and compute an envelope
+      const sliceStart = Math.floor((i / barCount) * len);
+      const sliceEnd = Math.min(len - 1, Math.floor(((i + 1) / barCount) * len));
+
+      let sum = 0;
+      let count = 0;
+      for (let j = sliceStart; j <= sliceEnd; j += 2) {
+        sum += Math.abs((this.dataArray[j] - 128) / 128);
+        count++;
+      }
+      const env = count > 0 ? sum / count : 0;
+
+      const target = Math.min(maxH, minH + (maxH - minH) * Math.min(1, env * 1.9) * energyBoost);
+      const prev = this.barHeights[i] || minH;
+      const next = prev + (target - prev) * smoothing;
+      this.barHeights[i] = next;
+
+      const h = next * (0.82 + intensity * 0.4);
+      const x = i * (barW + gap) + barW / 2;
+      ctx.lineWidth = barW;
+      ctx.beginPath();
+      ctx.moveTo(x, centerY - h * 0.5);
+      ctx.lineTo(x, centerY + h * 0.5);
+      ctx.stroke();
+    }
 
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
