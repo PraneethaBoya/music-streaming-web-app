@@ -83,7 +83,7 @@ class DataManager {
     const title = song?.title != null ? String(song.title) : '';
     const artistName = artist?.artistName != null ? String(artist.artistName) : '';
     const albumName = album?.albumName != null ? String(album.albumName) : '';
-    const cover = album?.albumCover != null ? String(album.albumCover) : '';
+    const cover = (song?.coverUrl != null ? String(song.coverUrl) : '') || (album?.albumCover != null ? String(album.albumCover) : '');
     const audio = song?.audioUrl != null ? String(song.audioUrl) : '';
     const duration = song?.duration != null ? String(song.duration) : '';
 

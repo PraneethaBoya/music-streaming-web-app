@@ -631,6 +631,7 @@ app.get('/api/catalog', async (req, res) => {
         s.id AS song_id,
         s.title AS song_title,
         s.duration AS song_duration,
+        s.cover_url AS song_cover,
         s.audio_url AS audio_url,
         s.created_at AS song_created_at
       FROM artists a
@@ -696,6 +697,7 @@ app.get('/api/catalog', async (req, res) => {
             title: row.song_title || '',
             duration: row.song_duration != null ? String(row.song_duration) : '',
             audioUrl: row.audio_url || '',
+            coverUrl: row.song_cover || '',
             liked: false
           });
         }

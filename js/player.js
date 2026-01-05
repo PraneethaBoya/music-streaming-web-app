@@ -615,7 +615,7 @@ class MusicPlayer {
       }
 
       if (artistPhotoEl) {
-        const fallbackArtist = 'assets/artists/default-artist.jpg';
+        const fallbackArtist = '/assets/artists/default-artist.jpg';
         artistPhotoEl.onerror = () => {
           artistPhotoEl.onerror = null;
           artistPhotoEl.src = fallbackArtist;
