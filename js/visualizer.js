@@ -394,7 +394,7 @@ class AudioVisualizer {
     const len = this.dataArray && this.dataArray.length ? this.dataArray.length : 0;
     if (len === 0) return;
 
-    const barCount = Math.max(34, Math.min(80, Math.floor(width / 7)));
+    const barCount = Math.max(33, Math.min(77, Math.floor(width / 7)));
     const gap = 2;
     const barW = Math.max(2, Math.floor((width - (barCount - 1) * gap) / barCount));
     const minH = Math.max(3, height * 0.12);
@@ -419,6 +419,7 @@ class AudioVisualizer {
 
     const energyBoost = 0.55 + this.energy * 0.9;
     const smoothing = 0.22; // higher = snappier, lower = smoother
+    const mid = (barCount - 1) / 2;
 
     for (let i = 0; i < barCount; i++) {
       // Map each bar to a slice of the time-domain signal and compute an envelope
@@ -433,7 +434,15 @@ class AudioVisualizer {
       }
       const env = count > 0 ? sum / count : 0;
 
-      const target = Math.min(maxH, minH + (maxH - minH) * Math.min(1, env * 1.9) * energyBoost);
+      // Center-weighted silhouette (like the reference): larger in the middle, smaller at edges.
+      // Keep some activity at edges to avoid a "flat" look.
+      const d = Math.abs(i - mid) / Math.max(1, mid); // 0..1
+      const shape = 0.35 + 0.65 * Math.pow(1 - d, 0.85);
+
+      const target = Math.min(
+        maxH,
+        minH + (maxH - minH) * Math.min(1, env * 2.05) * energyBoost * shape
+      );
       const prev = this.barHeights[i] || minH;
       const next = prev + (target - prev) * smoothing;
       this.barHeights[i] = next;
