@@ -20,6 +20,33 @@ class MusicPlayer {
     this.init();
   }
 
+  ensurePlaylistForCurrentSong(fallbackPlaylist = null) {
+    if (!this.currentSong) return;
+
+    // Use provided fallback playlist, otherwise try the global catalog, otherwise fall back to current song only.
+    let list = Array.isArray(fallbackPlaylist) ? fallbackPlaylist : null;
+    if (!list) {
+      try {
+        const dm = window.dataManager;
+        list = dm && typeof dm.getSongs === 'function' ? dm.getSongs() : null;
+      } catch (e) {
+      }
+    }
+    if (!Array.isArray(list) || list.length === 0) {
+      list = [this.currentSong];
+    }
+
+    if (!Array.isArray(this.playlist) || this.playlist.length === 0) {
+      this.setPlaylist(list);
+    }
+
+    // Ensure currentIndex is valid for the current song.
+    const songId = this.currentSong?.id != null ? String(this.currentSong.id) : '';
+    let idx = Array.isArray(this.playlist) ? this.playlist.findIndex(s => String(s?.id ?? '') === songId) : -1;
+    if (idx < 0) idx = 0;
+    this.currentIndex = idx;
+  }
+
   updateNowPlayingVisualState() {
     const overlay = document.getElementById('now-playing-overlay');
     if (!overlay) return;
@@ -213,12 +240,10 @@ class MusicPlayer {
 
     this.currentSong = song;
 
+    // Ensure we always have a valid playlist/index so overlay controls work.
+    this.ensurePlaylistForCurrentSong(playlist);
+
     this.saveState();
-    
-    if (playlist) {
-      this.setPlaylist(playlist);
-      this.currentIndex = this.playlist.findIndex(s => s.id === song.id);
-    }
 
     try {
       // Connect visualizer before loading audio
@@ -334,6 +359,16 @@ class MusicPlayer {
       const t = Number.isFinite(state.time) ? state.time : 0;
 
       this.currentSong = song;
+
+      // Restore a usable playlist so Now Playing controls work after refresh.
+      try {
+        const dm = dataManager || window.dataManager;
+        const list = dm && typeof dm.getSongs === 'function' ? dm.getSongs() : null;
+        this.ensurePlaylistForCurrentSong(list);
+      } catch (e) {
+        this.ensurePlaylistForCurrentSong([song]);
+      }
+
       this.audio.src = state.audio;
       this.audio.load();
       this.updateUI();
