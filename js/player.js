@@ -59,9 +59,8 @@ class MusicPlayer {
         <div id="now-playing-cover-wrap" class="now-playing-cover-wrap">
           <img id="now-playing-cover" class="cover-image" src="${this.getFallbackCover()}" alt="" />
           <img id="now-playing-artist-photo" class="now-playing-artist-photo" src="/assets/artists/default-artist.jpg" alt="" />
+          <canvas id="now-playing-visualizer" class="sonic-waves"></canvas>
         </div>
-
-        <canvas id="now-playing-visualizer" class="sonic-waves"></canvas>
 
         <div class="now-playing-meta">
           <div id="now-playing-title" class="now-playing-title"></div>
