@@ -265,14 +265,20 @@ class AudioVisualizer {
     this.isPlaying = false;
     this.targetAlpha = 0;
 
-    // Hide canvas with fade
+    this.alpha = 0;
+
+    // Hide canvas immediately
     if (this.canvas) {
       this.canvas.classList.remove('active');
     }
 
-    // Keep animating until we fade out fully, then cancel rAF
-    if (!this.animationFrameId) {
-      this.animate();
+    if (this.animationFrameId) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+
+    if (this.ctx && this.canvas) {
+      this.ctx.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientHeight);
     }
   }
 

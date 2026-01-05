@@ -20,6 +20,21 @@ class MusicPlayer {
     this.init();
   }
 
+  updateNowPlayingVisualState() {
+    const overlay = document.getElementById('now-playing-overlay');
+    if (!overlay) return;
+
+    overlay.classList.toggle('is-playing', !!this.isPlaying);
+
+    const coverEl = document.getElementById('now-playing-cover');
+    if (coverEl) {
+      const cover = this.getSongCoverUrl(this.currentSong);
+      const hasCover = !!(cover && String(cover).trim() !== '');
+      const showCover = !this.isPlaying && hasCover;
+      coverEl.style.display = showCover ? 'block' : 'none';
+    }
+  }
+
   getFallbackCover() {
     return '/assets/covers/default-cover.jpg';
   }
@@ -132,6 +147,7 @@ class MusicPlayer {
       if (overlay) overlay.style.display = 'block';
 
       this.updateNowPlayingControls();
+      this.updateNowPlayingVisualState();
 
       this.saveState();
     });
@@ -143,6 +159,7 @@ class MusicPlayer {
       }
 
       this.updateNowPlayingControls();
+      this.updateNowPlayingVisualState();
 
       this.saveState();
     });
@@ -154,6 +171,8 @@ class MusicPlayer {
         window.audioVisualizer.stop();
       }
 
+      this.updateNowPlayingVisualState();
+
       this.saveState();
     });
 
@@ -164,6 +183,8 @@ class MusicPlayer {
       if (window.audioVisualizer) {
         window.audioVisualizer.stop();
       }
+
+      this.updateNowPlayingVisualState();
 
       this.saveState();
     });
@@ -606,11 +627,13 @@ class MusicPlayer {
 
       const cover = this.getSongCoverUrl(this.currentSong);
       if (coverEl) {
+        const hasCover = !!(cover && String(cover).trim() !== '');
         coverEl.onerror = () => {
           coverEl.onerror = null;
-          coverEl.src = this.getFallbackCover();
+          coverEl.src = '';
+          coverEl.style.display = 'none';
         };
-        coverEl.src = cover && cover.trim() !== '' ? cover : this.getFallbackCover();
+        coverEl.src = hasCover ? cover : '';
         coverEl.alt = this.currentSong.title || '';
       }
 
@@ -656,6 +679,8 @@ class MusicPlayer {
         } catch (e) {
         }
       }
+
+      this.updateNowPlayingVisualState();
     }
   }
 
