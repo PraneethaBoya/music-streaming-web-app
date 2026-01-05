@@ -1701,6 +1701,147 @@ img {
 }
 
 /* ============================================
+  Now Playing Overlay
+  ============================================ */
+
+ .now-playing-overlay {
+   position: fixed;
+   inset: 0;
+   background: rgba(0, 0, 0, 0.92);
+   backdrop-filter: blur(10px);
+   z-index: 9999;
+   padding: 24px;
+   box-sizing: border-box;
+   display: none;
+ }
+
+ .now-playing-close {
+   position: absolute;
+   top: 16px;
+   right: 16px;
+   width: 42px;
+   height: 42px;
+   border-radius: 999px;
+   border: 1px solid rgba(255, 255, 255, 0.18);
+   background: rgba(0, 0, 0, 0.35);
+   color: #ffffff;
+   font-size: 22px;
+   cursor: pointer;
+   z-index: 6;
+ }
+
+ .now-playing-content {
+   max-width: 520px;
+   margin: 48px auto 0;
+   display: flex;
+   flex-direction: column;
+   gap: 16px;
+   align-items: center;
+   text-align: center;
+ }
+
+ .now-playing-cover-wrap {
+   position: relative;
+   width: min(76vw, 360px);
+   height: min(76vw, 360px);
+   border-radius: 18px;
+   overflow: hidden;
+   box-shadow: 0 20px 80px rgba(0, 0, 0, 0.55);
+ }
+
+ .cover-image {
+   position: relative;
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+   object-position: center;
+   opacity: 1;
+   z-index: 1;
+   display: block;
+ }
+
+ .sonic-waves {
+   position: absolute;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   height: 40%;
+   z-index: 3;
+   opacity: 0.35;
+   pointer-events: none;
+   display: block;
+ }
+
+ .sonic-waves.active {
+   opacity: 0.9;
+ }
+
+ .now-playing-meta {
+   width: 100%;
+ }
+
+ .now-playing-title {
+   font-size: 22px;
+   font-weight: 800;
+   color: #ffffff;
+   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+ }
+
+ .now-playing-artist {
+   margin-top: 6px;
+   color: rgba(255, 255, 255, 0.85);
+   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+ }
+
+ .now-playing-controls {
+   width: 100%;
+   display: flex;
+   justify-content: center;
+   gap: 24px;
+   z-index: 4;
+ }
+
+ .np-btn {
+   width: 56px;
+   height: 56px;
+   border-radius: 999px;
+   border: 1px solid rgba(255, 255, 255, 0.16);
+   background: rgba(0, 0, 0, 0.35);
+   color: #ffffff;
+   font-size: 20px;
+   cursor: pointer;
+   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+ }
+
+ .np-btn.np-play {
+   width: 64px;
+   height: 64px;
+   background: rgba(255, 0, 102, 0.18);
+   border-color: rgba(255, 0, 102, 0.45);
+   box-shadow: 0 0 22px rgba(255, 0, 102, 0.22);
+ }
+
+ .now-playing-seek {
+   width: 100%;
+   display: grid;
+   grid-template-columns: 54px 1fr 54px;
+   gap: 12px;
+   align-items: center;
+   z-index: 4;
+ }
+
+ .np-time {
+   color: rgba(255, 255, 255, 0.85);
+   font-size: 12px;
+   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+ }
+
+ .np-seek {
+   width: 100%;
+   accent-color: #ff0066;
+ }
+
+/* ============================================
    Modals
    ============================================ */
 

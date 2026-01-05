@@ -311,10 +311,18 @@ class AudioVisualizer {
     const width = this.canvas.clientWidth;
     const height = this.canvas.clientHeight;
 
-    // Subtle trail fade for “continuous flow”
+    const isOverlayCanvas = this.canvas && this.canvas.id === 'now-playing-visualizer';
+
+    // Avoid darkening the cover image on the Now Playing overlay.
+    // For the overlay canvas, keep a transparent background by clearing each frame.
+    // For the fixed background canvas, keep a subtle trail fade.
     this.ctx.globalCompositeOperation = 'source-over';
-    this.ctx.fillStyle = `rgba(0, 0, 0, ${0.12})`;
-    this.ctx.fillRect(0, 0, width, height);
+    if (isOverlayCanvas) {
+      this.ctx.clearRect(0, 0, width, height);
+    } else {
+      this.ctx.fillStyle = `rgba(0, 0, 0, ${0.12})`;
+      this.ctx.fillRect(0, 0, width, height);
+    }
 
     // Draw multi-layer sonic waves
     this.drawSonicWaves(width, height);

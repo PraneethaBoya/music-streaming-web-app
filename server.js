@@ -16,6 +16,8 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 const DEFAULT_ARTIST_IMAGE = 'assets/artists/default-artist.jpg';
 
+const DEFAULT_COVER_IMAGE = 'assets/covers/default-cover.jpg';
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -42,6 +44,28 @@ app.get('/assets/artists/default-artist.jpg', (req, res) => {
     + '<circle cx="256" cy="206" r="92" fill="#151515" stroke="url(#p)" stroke-width="10"/>'
     + '<path d="M120 430c28-74 84-112 136-112s108 38 136 112" fill="#151515" stroke="url(#p)" stroke-width="10" stroke-linecap="round"/>'
     + '<text x="256" y="486" text-anchor="middle" fill="#bdbdbd" font-family="Inter, Arial" font-size="28">Artist</text>'
+    + '</svg>'
+  );
+});
+
+app.get('/assets/covers/default-cover.jpg', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.send(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">'
+    + '<defs>'
+      + '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+        + '<stop offset="0" stop-color="#1b1b1b"/>'
+        + '<stop offset="1" stop-color="#0a0a0a"/>'
+      + '</linearGradient>'
+      + '<linearGradient id="p" x1="0" y1="1" x2="1" y2="0">'
+        + '<stop offset="0" stop-color="#ff0066"/>'
+        + '<stop offset="1" stop-color="#8e2de2"/>'
+      + '</linearGradient>'
+    + '</defs>'
+    + '<rect width="800" height="800" fill="url(#g)"/>'
+    + '<circle cx="400" cy="400" r="220" fill="#111" stroke="url(#p)" stroke-width="12"/>'
+    + '<circle cx="400" cy="400" r="18" fill="#ff2d8d"/>'
+    + '<text x="400" y="710" fill="#bdbdbd" font-size="44" font-family="Inter, Arial" text-anchor="middle">MusicStream</text>'
     + '</svg>'
   );
 });

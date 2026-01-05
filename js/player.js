@@ -21,17 +21,7 @@ class MusicPlayer {
   }
 
   getFallbackCover() {
-    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-      '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">'
-        + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
-        + '<stop offset="0" stop-color="#1b1b1b"/><stop offset="1" stop-color="#0a0a0a"/>'
-        + '</linearGradient></defs>'
-        + '<rect width="800" height="800" fill="url(#g)"/>'
-        + '<circle cx="400" cy="400" r="220" fill="#111" stroke="#ff2d8d" stroke-width="10"/>'
-        + '<circle cx="400" cy="400" r="18" fill="#ff2d8d"/>'
-        + '<text x="400" y="710" fill="#bdbdbd" font-size="44" font-family="Inter, Arial" text-anchor="middle">MusicStream</text>'
-      + '</svg>'
-    );
+    return 'assets/covers/default-cover.jpg';
   }
 
   getSongAudioUrl(song) {
@@ -47,29 +37,34 @@ class MusicPlayer {
 
     const overlay = document.createElement('div');
     overlay.id = 'now-playing-overlay';
-    overlay.style.cssText = [
-      'position:fixed',
-      'inset:0',
-      'background:rgba(0,0,0,0.92)',
-      'backdrop-filter:blur(10px)',
-      'display:none',
-      'z-index:9999',
-      'padding:24px',
-      'box-sizing:border-box'
-    ].join(';');
+    overlay.className = 'now-playing-overlay';
 
     overlay.innerHTML = `
-      <div id="now-playing-close" style="position:absolute;top:16px;right:16px;font-size:28px;cursor:pointer;line-height:1;">✕</div>
-      <div style="max-width:520px;margin:48px auto 0;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;">
-        <div id="now-playing-cover-wrap" style="position:relative;width:min(76vw,360px);height:min(76vw,360px);border-radius:18px;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.55);">
-          <img id="now-playing-cover" src="${this.getFallbackCover()}" alt="" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" />
-          <canvas id="now-playing-visualizer" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;display:block;"></canvas>
+      <button id="now-playing-close" class="now-playing-close" type="button" aria-label="Close">✕</button>
+      <div class="now-playing-content">
+        <div id="now-playing-cover-wrap" class="now-playing-cover-wrap">
+          <img id="now-playing-cover" class="cover-image" src="${this.getFallbackCover()}" alt="" />
+          <canvas id="now-playing-visualizer" class="sonic-waves"></canvas>
         </div>
-        <div style="width:100%;">
-          <div id="now-playing-title" style="font-size:22px;font-weight:700;"> </div>
-          <div id="now-playing-artist" style="margin-top:6px;opacity:0.8;"> </div>
+
+        <div class="now-playing-meta">
+          <div id="now-playing-title" class="now-playing-title"></div>
+          <div id="now-playing-artist" class="now-playing-artist"></div>
         </div>
-        <div id="now-playing-like"></div>
+
+        <div id="now-playing-like" class="now-playing-like"></div>
+
+        <div class="now-playing-controls" aria-label="Player controls">
+          <button type="button" class="np-btn" id="np-prev" aria-label="Previous">⏮</button>
+          <button type="button" class="np-btn np-play" id="np-play" aria-label="Play/Pause">▶</button>
+          <button type="button" class="np-btn" id="np-next" aria-label="Next">⏭</button>
+        </div>
+
+        <div class="now-playing-seek">
+          <span class="np-time" id="np-current-time">0:00</span>
+          <input id="np-seek" class="np-seek" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek" />
+          <span class="np-time" id="np-duration">0:00</span>
+        </div>
       </div>
     `;
 
@@ -80,6 +75,26 @@ class MusicPlayer {
       closeBtn.addEventListener('click', () => {
         overlay.style.display = 'none';
       });
+    }
+
+    const prevBtn = overlay.querySelector('#np-prev');
+    if (prevBtn) prevBtn.addEventListener('click', (e) => { e.stopPropagation(); this.previous(); });
+
+    const nextBtn = overlay.querySelector('#np-next');
+    if (nextBtn) nextBtn.addEventListener('click', (e) => { e.stopPropagation(); this.next(); });
+
+    const playBtn = overlay.querySelector('#np-play');
+    if (playBtn) playBtn.addEventListener('click', (e) => { e.stopPropagation(); this.togglePlay(); this.updateNowPlayingControls(); });
+
+    const seek = overlay.querySelector('#np-seek');
+    if (seek) {
+      const onSeek = (e) => {
+        e.stopPropagation();
+        const val = Number(seek.value);
+        if (Number.isFinite(val)) this.seek(val);
+      };
+      seek.addEventListener('input', onSeek);
+      seek.addEventListener('change', onSeek);
     }
   }
 
@@ -115,6 +130,8 @@ class MusicPlayer {
       const overlay = document.getElementById('now-playing-overlay');
       if (overlay) overlay.style.display = 'block';
 
+      this.updateNowPlayingControls();
+
       this.saveState();
     });
 
@@ -123,6 +140,8 @@ class MusicPlayer {
       if (window.audioVisualizer) {
         window.audioVisualizer.stop();
       }
+
+      this.updateNowPlayingControls();
 
       this.saveState();
     });
@@ -509,16 +528,28 @@ class MusicPlayer {
       progressBar.style.width = `${progress}%`;
     }
 
+    const npSeek = document.getElementById('np-seek');
+    if (npSeek && !npSeek.matches(':active')) {
+      npSeek.value = String(progress);
+    }
+
     // Update time displays
     const currentTimeEl = document.getElementById('player-current-time');
     const durationEl = document.getElementById('player-duration');
 
-    if (currentTimeEl) {
-      currentTimeEl.textContent = this.formatTime(this.audio.currentTime);
-    }
-    if (durationEl) {
-      durationEl.textContent = this.formatTime(this.audio.duration);
-    }
+    if (currentTimeEl) currentTimeEl.textContent = this.formatTime(this.audio.currentTime);
+    if (durationEl) durationEl.textContent = this.formatTime(this.audio.duration);
+
+    const npCurrent = document.getElementById('np-current-time');
+    const npDuration = document.getElementById('np-duration');
+    if (npCurrent) npCurrent.textContent = this.formatTime(this.audio.currentTime);
+    if (npDuration) npDuration.textContent = this.formatTime(this.audio.duration);
+  }
+
+  updateNowPlayingControls() {
+    const btn = document.getElementById('np-play');
+    if (!btn) return;
+    btn.textContent = this.isPlaying ? '⏸' : '▶';
   }
 
   /**
