@@ -64,6 +64,11 @@
               <input type="file" id="cover-image" name="cover" accept="image/*">
               <small style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: block;">Recommended: 300x300px or larger</small>
             </div>
+            <div class="form-group">
+              <label for="artist-photo">Artist Photo (Optional)</label>
+              <input type="file" id="artist-photo" name="artistPhoto" accept="image/*">
+              <small style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: block;">If not provided, a default artist image will be used</small>
+            </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-md);">Upload Song</button>
           </form>
         </div>
@@ -137,6 +142,7 @@
       const artistInput = document.getElementById('artist-name');
       const albumInput = document.getElementById('album-name');
       const coverInput = document.getElementById('cover-image');
+      const artistPhotoInput = document.getElementById('artist-photo');
       if (!form || !fileInput) return;
 
       const apiBaseUrl = (typeof window !== 'undefined' && window.API_BASE_URL)
@@ -169,6 +175,9 @@
         const cover = coverInput && coverInput.files && coverInput.files[0];
         if (cover) fd.append('cover', cover);
 
+        const artistPhoto = artistPhotoInput && artistPhotoInput.files && artistPhotoInput.files[0];
+        if (artistPhoto) fd.append('artistPhoto', artistPhoto);
+
         try {
           const res = await fetch(`${apiBaseUrl}/upload/song`, {
             method: 'POST',
@@ -183,6 +192,7 @@
           if (artistInput) artistInput.value = '';
           if (albumInput) albumInput.value = '';
           if (coverInput) coverInput.value = '';
+          if (artistPhotoInput) artistPhotoInput.value = '';
           window.location.href = 'home.html';
         } catch (err) {
           alert(err?.message || 'Upload failed');

@@ -14,6 +14,8 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
+const DEFAULT_ARTIST_IMAGE = 'assets/artists/default-artist.jpg';
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -21,6 +23,28 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files (frontend)
 app.use(express.static(path.join(__dirname)));
+
+app.get('/assets/artists/default-artist.jpg', (req, res) => {
+  res.setHeader('Content-Type', 'image/svg+xml; charset=utf-8');
+  res.send(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">'
+    + '<defs>'
+      + '<radialGradient id="g" cx="35%" cy="30%" r="80%">'
+        + '<stop offset="0" stop-color="#2a2a2a"/>'
+        + '<stop offset="1" stop-color="#0b0b0b"/>'
+      + '</radialGradient>'
+      + '<linearGradient id="p" x1="0" y1="0" x2="1" y2="1">'
+        + '<stop offset="0" stop-color="#ff0066"/>'
+        + '<stop offset="1" stop-color="#8e2de2"/>'
+      + '</linearGradient>'
+    + '</defs>'
+    + '<rect width="512" height="512" rx="256" fill="url(#g)"/>'
+    + '<circle cx="256" cy="206" r="92" fill="#151515" stroke="url(#p)" stroke-width="10"/>'
+    + '<path d="M120 430c28-74 84-112 136-112s108 38 136 112" fill="#151515" stroke="url(#p)" stroke-width="10" stroke-linecap="round"/>'
+    + '<text x="256" y="486" text-anchor="middle" fill="#bdbdbd" font-family="Inter, Arial" font-size="28">Artist</text>'
+    + '</svg>'
+  );
+});
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), { fallthrough: false }));
 
@@ -119,7 +143,8 @@ const coverUpload = multer({
 const uploadSong = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => {
-      const subfolder = file.fieldname === 'cover' ? 'covers' : 'audio';
+      const field = String(file.fieldname || '').toLowerCase();
+      const subfolder = field === 'cover' ? 'covers' : (field === 'artistphoto' ? 'artists' : 'audio');
       const dest = path.join(uploadsRoot, subfolder);
       fs.mkdirSync(dest, { recursive: true });
       cb(null, dest);
@@ -137,6 +162,11 @@ const uploadSong = multer({
     if (field === 'cover') {
       if (mime.startsWith('image/')) return cb(null, true);
       return cb(new Error('Unsupported cover image type. Please upload an image file.'));
+    }
+
+    if (field === 'artistphoto') {
+      if (mime.startsWith('image/')) return cb(null, true);
+      return cb(new Error('Unsupported artist image type. Please upload an image file.'));
     }
 
     const allowedMimes = new Set([
@@ -313,7 +343,8 @@ app.post('/api/upload/song', (req, res) => {
 
   uploadSong.fields([
     { name: 'file', maxCount: 1 },
-    { name: 'cover', maxCount: 1 }
+    { name: 'cover', maxCount: 1 },
+    { name: 'artistPhoto', maxCount: 1 }
   ])(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ error: err.message || 'Invalid form data' });
@@ -330,19 +361,29 @@ app.post('/api/upload/song', (req, res) => {
     }
 
     const coverFile = req.files && req.files.cover && req.files.cover[0] ? req.files.cover[0] : null;
+    const artistPhotoFile = req.files && req.files.artistPhoto && req.files.artistPhoto[0] ? req.files.artistPhoto[0] : null;
 
     const audioUrl = `/uploads/audio/${audioFile.filename}`;
     const coverUrl = coverFile ? `/uploads/covers/${coverFile.filename}` : null;
+    const artistImageUrl = artistPhotoFile ? `/uploads/artists/${artistPhotoFile.filename}` : null;
 
     try {
       const artistName = String(artist).trim();
       const albumTitle = (album ? String(album).trim() : '') || 'Singles';
 
       const artistResult = await pool.query(
-        'INSERT INTO artists (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name',
-        [artistName]
+        'INSERT INTO artists (name, image_url) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name, image_url',
+        [artistName, artistImageUrl || DEFAULT_ARTIST_IMAGE]
       );
-      const artistRow = artistResult.rows[0];
+      let artistRow = artistResult.rows[0];
+
+      if ((!artistRow.image_url || String(artistRow.image_url).trim() === '') && (artistImageUrl || DEFAULT_ARTIST_IMAGE)) {
+        const updatedArtist = await pool.query(
+          'UPDATE artists SET image_url = $1 WHERE id = $2 RETURNING id, name, image_url',
+          [artistImageUrl || DEFAULT_ARTIST_IMAGE, artistRow.id]
+        );
+        if (updatedArtist.rows.length > 0) artistRow = updatedArtist.rows[0];
+      }
 
       let albumId = null;
       const existingAlbum = await pool.query(

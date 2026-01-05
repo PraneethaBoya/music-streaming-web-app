@@ -98,9 +98,11 @@ class UIManager {
    * Render artist card
    */
   renderArtistCard(artist) {
+    const fallback = 'assets/artists/default-artist.jpg';
+    const src = artist?.image && String(artist.image).trim() !== '' ? artist.image : fallback;
     return `
       <div class="artist-card" data-artist-id="${artist.id}">
-        <img src="${artist.image}" alt="${artist.name}" class="artist-image">
+        <img src="${src}" alt="${artist.name}" class="artist-image" onerror="this.onerror=null;this.src='${fallback}'">
         <div class="artist-name">${artist.name}</div>
         <div class="artist-followers">${artist.followers} followers</div>
       </div>
