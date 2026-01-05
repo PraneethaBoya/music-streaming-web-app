@@ -146,8 +146,8 @@
       if (!form || !fileInput) return;
 
       const apiBaseUrl = (typeof window !== 'undefined' && window.API_BASE_URL)
-        ? window.API_BASE_URL
-        : 'http://localhost:3000/api';
+        ? String(window.API_BASE_URL).replace(/\/$/, '')
+        : `${window.location.origin}/api`;
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
