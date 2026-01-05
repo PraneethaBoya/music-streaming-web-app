@@ -137,13 +137,16 @@ class MusicPlayer {
     });
 
     this.audio.addEventListener('play', () => {
-      // Start visualizer when playing
-      if (window.audioVisualizer) {
-        window.audioVisualizer.start();
-      }
-
       const overlay = document.getElementById('now-playing-overlay');
       if (overlay) overlay.style.display = 'block';
+
+      // Start visualizer when playing (after overlay is visible so canvas has size)
+      if (window.audioVisualizer) {
+        window.audioVisualizer.start();
+        if (typeof window.audioVisualizer.resizeCanvas === 'function') {
+          window.audioVisualizer.resizeCanvas();
+        }
+      }
 
       this.updateNowPlayingControls();
       this.updateNowPlayingVisualState();
