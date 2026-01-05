@@ -388,58 +388,36 @@ class AudioVisualizer {
     const amp = this.baseAmplitude + (this.maxAmplitude - this.baseAmplitude) * intensity;
     const softAlpha = this.alpha;
 
-    // Neon blue gradient for waveform
-    const gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, `rgba(79, 195, 247, ${1.0 * softAlpha})`);
-    gradient.addColorStop(0.55, `rgba(33, 150, 243, ${1.0 * softAlpha})`);
-    gradient.addColorStop(1, `rgba(3, 169, 244, ${1.0 * softAlpha})`);
+    // Spotify-style barcode waveform (frequency-driven vertical bars)
+    const bins = this.freqArray && this.freqArray.length ? this.freqArray.length : 0;
+    if (bins === 0) return;
 
-    ctx.globalCompositeOperation = 'lighter';
+    const barCount = Math.max(36, Math.min(84, Math.floor(width / 6)));
+    const gap = 2;
+    const barW = Math.max(2, Math.floor((width - (barCount - 1) * gap) / barCount));
+    const scroll = Math.floor(this.t * 2) % bins;
 
-    // Smooth waveform (time-domain) centered on the cover
-    const data = this.dataArray;
-    const n = data && data.length ? data.length : 0;
-    if (n === 0) return;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 0.95 * softAlpha;
+    ctx.strokeStyle = '#111';
+    ctx.lineCap = 'round';
+    ctx.shadowBlur = 0;
 
-    const glowBoost = 1 + (this.beat * 2.0);
-    const step = Math.max(3, Math.floor(this.pointStep));
+    for (let i = 0; i < barCount; i++) {
+      const binIndex = (scroll + Math.floor((i / barCount) * bins)) % bins;
+      const v = this.freqArray[binIndex] / 255;
+      const energyBoost = 0.65 + this.energy * 0.75;
+      const h = Math.max(3, (height * 0.78) * (0.12 + v * 0.95) * energyBoost);
+      const x = i * (barW + gap) + barW / 2;
 
-    for (let li = 0; li < this.waveLayers.length; li++) {
-      const layer = this.waveLayers[li];
-      const layerAmp = amp * layer.amp;
-      const layerAlpha = (layer.opacity || 0.6) * softAlpha;
-
-      ctx.strokeStyle = gradient;
-      ctx.lineWidth = layer.thickness;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.globalAlpha = layerAlpha;
-      ctx.shadowBlur = (layer.blur || 18) * glowBoost;
-      ctx.shadowColor = `rgba(79, 195, 247, ${0.55 * layerAlpha})`;
-
+      ctx.lineWidth = barW;
       ctx.beginPath();
-      let first = true;
-      for (let x = 0; x <= width; x += step) {
-        const idx = Math.floor((x / Math.max(1, width)) * (n - 1));
-        const v = (data[idx] - 128) / 128; // -1..1
-        const phase = (x / Math.max(1, width)) * Math.PI * 2 * layer.freq + this.t * layer.speed;
-        const y = centerY
-          + (v * layerAmp * 0.55)
-          + (Math.sin(phase) * layerAmp * 0.25);
-
-        if (first) {
-          ctx.moveTo(x, y);
-          first = false;
-        } else {
-          ctx.lineTo(x, y);
-        }
-      }
+      ctx.moveTo(x, centerY - h * 0.5);
+      ctx.lineTo(x, centerY + h * 0.5);
       ctx.stroke();
     }
 
     ctx.globalAlpha = 1;
-    ctx.shadowBlur = 0;
-    ctx.globalCompositeOperation = 'source-over';
   }
 
   /**

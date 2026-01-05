@@ -1761,33 +1761,29 @@ img {
    display: block;
  }
 
- .now-playing-overlay.is-playing .cover-image {
-   display: none !important;
- }
-
  .sonic-waves {
-   position: absolute;
-   top: 50%;
-   left: 50%;
-   width: 200px;
-   height: 80px;
-   transform: translate(-50%, -50%);
+   position: relative;
+   width: min(70%, 280px);
+   height: 56px;
+   margin-top: 12px;
    z-index: 3;
    opacity: 0;
    pointer-events: none;
    display: block;
+   background: rgba(255, 255, 255, 0.9);
+   border-radius: 14px;
  }
 
  .sonic-wave-canvas {
-   position: absolute;
-   top: 50%;
-   left: 50%;
-   width: 200px;
-   height: 80px;
-   transform: translate(-50%, -50%);
+   position: relative;
+   width: min(70%, 280px);
+   height: 56px;
+   margin-top: 12px;
    z-index: 3;
    opacity: 0;
    pointer-events: none;
+   background: rgba(255, 255, 255, 0.9);
+   border-radius: 14px;
  }
 
  .now-playing-artist-photo {
@@ -1801,6 +1797,10 @@ img {
    z-index: 7;
    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
    border: 2px solid rgba(255, 255, 255, 0.22);
+ }
+
+ .now-playing-overlay .now-playing-artist-photo {
+   display: none;
  }
 
  .sonic-waves.active {
