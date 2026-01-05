@@ -199,7 +199,7 @@ class DataManager {
     return catalog.map(a => ({
       id: a.artistId,
       name: a.artistName,
-      image: (a.artistImage && String(a.artistImage).trim() !== '') ? a.artistImage : 'assets/artists/default-artist.jpg',
+      image: (a.artistImage && String(a.artistImage).trim() !== '') ? a.artistImage : '/assets/artists/default-artist.jpg',
       followers: '0'
     }));
   }

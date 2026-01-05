@@ -21,7 +21,7 @@ class MusicPlayer {
   }
 
   getFallbackCover() {
-    return 'assets/covers/default-cover.jpg';
+    return '/assets/covers/default-cover.jpg';
   }
 
   getSongAudioUrl(song) {
@@ -44,7 +44,7 @@ class MusicPlayer {
       <div class="now-playing-content">
         <div id="now-playing-cover-wrap" class="now-playing-cover-wrap">
           <img id="now-playing-cover" class="cover-image" src="${this.getFallbackCover()}" alt="" />
-          <img id="now-playing-artist-photo" class="now-playing-artist-photo" src="assets/artists/default-artist.jpg" alt="" />
+          <img id="now-playing-artist-photo" class="now-playing-artist-photo" src="/assets/artists/default-artist.jpg" alt="" />
           <canvas id="now-playing-visualizer" class="sonic-waves"></canvas>
         </div>
 
