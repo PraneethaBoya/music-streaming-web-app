@@ -9,6 +9,10 @@ class LikeManager {
     this.init();
   }
 
+  normalizeSongId(songId) {
+    return songId != null ? String(songId) : '';
+  }
+
   /**
    * Initialize like manager
    */
@@ -22,17 +26,19 @@ class LikeManager {
   toggleLike(songId) {
     const user = this.profileManager.getCurrentUser();
     const likedSongs = user.likedSongs || [];
-    const index = likedSongs.indexOf(songId);
+    const key = this.normalizeSongId(songId);
+    const normalized = likedSongs.map(s => this.normalizeSongId(s)).filter(Boolean);
+    const index = normalized.indexOf(key);
 
     if (index > -1) {
       // Unlike
-      likedSongs.splice(index, 1);
+      normalized.splice(index, 1);
     } else {
       // Like
-      likedSongs.push(songId);
+      normalized.push(key);
     }
 
-    user.likedSongs = likedSongs;
+    user.likedSongs = normalized;
     this.profileManager.currentUser = user;
     this.profileManager.saveUser();
 
@@ -48,7 +54,8 @@ class LikeManager {
   isLiked(songId) {
     const user = this.profileManager.getCurrentUser();
     const likedSongs = user.likedSongs || [];
-    return likedSongs.includes(songId);
+    const key = this.normalizeSongId(songId);
+    return likedSongs.map(s => this.normalizeSongId(s)).includes(key);
   }
 
   /**
@@ -85,8 +92,8 @@ class LikeManager {
   updateLikeButtons() {
     const buttons = document.querySelectorAll('[data-like-song-id]');
     buttons.forEach(btn => {
-      const songId = parseInt(btn.getAttribute('data-like-song-id'));
-      this.updateLikeButton(songId);
+      const songId = btn.getAttribute('data-like-song-id');
+      this.updateLikeButton(this.normalizeSongId(songId));
     });
   }
 

@@ -20,11 +20,62 @@ class MusicPlayer {
     this.init();
   }
 
+  getSongAudioUrl(song) {
+    return (song && (song.audio || song.audioUrl)) ? String(song.audio || song.audioUrl) : '';
+  }
+
+  getSongCoverUrl(song) {
+    return (song && (song.cover || song.coverImage)) ? String(song.cover || song.coverImage) : '';
+  }
+
+  ensureNowPlayingOverlay() {
+    if (document.getElementById('now-playing-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'now-playing-overlay';
+    overlay.style.cssText = [
+      'position:fixed',
+      'inset:0',
+      'background:rgba(0,0,0,0.92)',
+      'backdrop-filter:blur(10px)',
+      'display:none',
+      'z-index:9999',
+      'padding:24px',
+      'box-sizing:border-box'
+    ].join(';');
+
+    overlay.innerHTML = `
+      <div id="now-playing-close" style="position:absolute;top:16px;right:16px;font-size:28px;cursor:pointer;line-height:1;">✕</div>
+      <div style="max-width:520px;margin:48px auto 0;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;">
+        <img id="now-playing-cover" src="" alt="" style="width:min(76vw,360px);height:min(76vw,360px);object-fit:cover;border-radius:18px;box-shadow:0 20px 80px rgba(0,0,0,0.55);" />
+        <div style="width:100%;">
+          <div id="now-playing-title" style="font-size:22px;font-weight:700;"> </div>
+          <div id="now-playing-artist" style="margin-top:6px;opacity:0.8;"> </div>
+        </div>
+        <div id="now-playing-like"></div>
+        <div style="width:100%;height:160px;border-radius:16px;overflow:hidden;">
+          <canvas id="now-playing-visualizer" style="width:100%;height:100%;display:block;"></canvas>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeBtn = overlay.querySelector('#now-playing-close');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        overlay.style.display = 'none';
+      });
+    }
+  }
+
   /**
    * Initialize player
    */
   init() {
     this.audio.volume = this.volume;
+
+    this.ensureNowPlayingOverlay();
     
     // Connect to visualizer if available
     if (window.audioVisualizer) {
@@ -45,6 +96,9 @@ class MusicPlayer {
       if (window.audioVisualizer) {
         window.audioVisualizer.start();
       }
+
+      const overlay = document.getElementById('now-playing-overlay');
+      if (overlay) overlay.style.display = 'block';
     });
 
     this.audio.addEventListener('pause', () => {
@@ -82,7 +136,8 @@ class MusicPlayer {
    * Load and play a song
    */
   async loadSong(song, playlist = null) {
-    if (!song || !song.audio) {
+    const audioUrl = this.getSongAudioUrl(song);
+    if (!song || !audioUrl) {
       console.error('Invalid song data');
       return;
     }
@@ -100,8 +155,10 @@ class MusicPlayer {
         window.audioVisualizer.connectAudio(this.audio);
       }
       
-      this.audio.src = song.audio;
-      await this.audio.load();
+      this.audio.pause();
+      this.audio.currentTime = 0;
+      this.audio.src = audioUrl;
+      this.audio.load();
       this.updateUI();
       
       // Track song play
@@ -333,7 +390,7 @@ class MusicPlayer {
     const nowPlayingInfo = document.querySelector('.player-now-playing-info');
 
     if (imageEl) {
-      imageEl.src = this.currentSong.cover || '';
+      imageEl.src = this.getSongCoverUrl(this.currentSong) || '';
       imageEl.style.display = 'block';
     }
     if (titleEl) titleEl.textContent = this.currentSong.title;
@@ -345,6 +402,43 @@ class MusicPlayer {
 
     // Highlight current song in lists
     this.highlightCurrentSong();
+
+    const overlay = document.getElementById('now-playing-overlay');
+    if (overlay) {
+      const coverEl = document.getElementById('now-playing-cover');
+      const titleEl2 = document.getElementById('now-playing-title');
+      const artistEl2 = document.getElementById('now-playing-artist');
+      const likeEl = document.getElementById('now-playing-like');
+
+      const cover = this.getSongCoverUrl(this.currentSong);
+      if (coverEl) {
+        coverEl.src = cover && cover.trim() !== '' ? cover : 'https://via.placeholder.com/600x600/111111/FFFFFF?text=Music';
+        coverEl.alt = this.currentSong.title || '';
+      }
+      if (titleEl2) titleEl2.textContent = this.currentSong.title || '';
+      if (artistEl2) artistEl2.textContent = this.currentSong.artist || '';
+
+      if (likeEl && window.likeManager && typeof window.likeManager.renderLikeButton === 'function') {
+        likeEl.innerHTML = window.likeManager.renderLikeButton(String(this.currentSong.id), 'medium');
+        const btn = likeEl.querySelector('[data-like-song-id]');
+        if (btn) {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.likeManager.toggleLike(String(this.currentSong.id));
+          });
+        }
+      }
+
+      const canvas = document.getElementById('now-playing-visualizer');
+      if (canvas && window.audioVisualizer && window.audioVisualizer.canvas !== canvas) {
+        try {
+          window.audioVisualizer.canvas = canvas;
+          window.audioVisualizer.ctx = canvas.getContext('2d');
+          if (typeof window.audioVisualizer.resize === 'function') window.audioVisualizer.resize();
+        } catch (e) {
+        }
+      }
+    }
   }
 
   /**

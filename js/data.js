@@ -9,6 +9,28 @@ class DataManager {
     this.loaded = false;
   }
 
+  normalizeSong(raw) {
+    const id = raw?.id != null ? String(raw.id) : '';
+    const title = raw?.title != null ? String(raw.title) : '';
+    const artist = raw?.artist != null ? String(raw.artist) : '';
+    const album = raw?.album != null ? String(raw.album) : '';
+    const duration = raw?.duration != null && String(raw.duration).trim() !== '' ? raw.duration : '';
+    const cover = raw?.cover || raw?.cover_url || raw?.coverImage || raw?.cover_image || '';
+    const audio = raw?.audio || raw?.audio_url || raw?.audioUrl || raw?.audio_url || '';
+
+    return {
+      id,
+      title,
+      artist,
+      album,
+      duration,
+      cover,
+      audio,
+      coverImage: cover,
+      audioUrl: audio
+    };
+  }
+
   /**
    * Load music data from JSON file
    */
@@ -26,15 +48,7 @@ class DataManager {
       if (apiRes && apiRes.ok) {
         const songs = await apiRes.json();
         this.data = {
-          songs: Array.isArray(songs) ? songs.map(s => ({
-            id: s.id,
-            title: s.title,
-            artist: s.artist || '',
-            album: s.album || '',
-            duration: s.duration || null,
-            cover: s.cover || s.cover_url || null,
-            audio: s.audio || s.audio_url || null
-          })) : [],
+          songs: Array.isArray(songs) ? songs.map(s => this.normalizeSong(s)) : [],
           artists: [],
           albums: [],
           playlists: []
@@ -44,7 +58,13 @@ class DataManager {
       }
 
       const response = await fetch('./data.json');
-      this.data = await response.json();
+      const local = await response.json();
+      this.data = {
+        songs: Array.isArray(local?.songs) ? local.songs.map(s => this.normalizeSong(s)) : [],
+        artists: Array.isArray(local?.artists) ? local.artists : [],
+        albums: Array.isArray(local?.albums) ? local.albums : [],
+        playlists: Array.isArray(local?.playlists) ? local.playlists : []
+      };
       this.loaded = true;
       return this.data;
     } catch (error) {
@@ -64,7 +84,8 @@ class DataManager {
    * Get song by ID
    */
   getSongById(id) {
-    return this.data?.songs.find(song => song.id === id);
+    const key = id != null ? String(id) : '';
+    return this.data?.songs.find(song => String(song.id) === key);
   }
 
   /**

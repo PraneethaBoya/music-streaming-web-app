@@ -11,15 +11,34 @@ class UIManager {
     this.trackingManager = trackingManager;
   }
 
+  normalizeSongId(songId) {
+    return songId != null ? String(songId) : '';
+  }
+
+  getCoverSrc(song) {
+    const cover = song?.cover || song?.coverImage || '';
+    return cover && String(cover).trim() !== ''
+      ? cover
+      : 'https://via.placeholder.com/300x300/111111/FFFFFF?text=Music';
+  }
+
+  getDurationText(song) {
+    const d = song?.duration;
+    return d == null || String(d).trim() === '' || String(d).toLowerCase() === 'null'
+      ? ''
+      : String(d);
+  }
+
   /**
    * Render song card
    */
   renderSongCard(song) {
-    const likeBtn = this.likeManager.renderLikeButton(song.id, 'small');
+    const likeBtn = this.likeManager.renderLikeButton(this.normalizeSongId(song?.id), 'small');
+    const coverSrc = this.getCoverSrc(song);
     return `
       <div class="song-card" data-song-id="${song.id}">
         <div class="song-card-image-wrapper">
-          <img src="${song.cover}" alt="${song.title}" class="song-card-image">
+          <img src="${coverSrc}" alt="${song?.title || ''}" class="song-card-image">
           <div class="play-overlay">
             <button class="play-song-btn" data-song-id="${song.id}">
               <i class="icon-play">▶️</i>
@@ -40,11 +59,13 @@ class UIManager {
    */
   renderSongListItem(song, index = null) {
     const number = index !== null ? index + 1 : '';
-    const likeBtn = this.likeManager.renderLikeButton(song.id, 'small');
+    const likeBtn = this.likeManager.renderLikeButton(this.normalizeSongId(song?.id), 'small');
+    const coverSrc = this.getCoverSrc(song);
+    const durationText = this.getDurationText(song);
     return `
       <div class="song-list-item" data-song-id="${song.id}">
         ${number ? `<div class="song-list-number">${number}</div>` : ''}
-        <img src="${song.cover}" alt="${song.title}" class="song-list-image">
+        <img src="${coverSrc}" alt="${song?.title || ''}" class="song-list-image">
         <div class="song-list-info">
           <div class="song-list-title">${song.title}</div>
           <div class="song-list-artist">${song.artist}</div>
@@ -52,7 +73,7 @@ class UIManager {
         <div class="song-list-actions">
           ${likeBtn}
         </div>
-        <div class="song-list-duration">${song.duration}</div>
+        <div class="song-list-duration">${durationText}</div>
       </div>
     `;
   }
@@ -160,16 +181,16 @@ class UIManager {
     container.querySelectorAll('.play-song-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const songId = parseInt(btn.getAttribute('data-song-id'));
-        this.playSong(songId);
+        const songId = btn.getAttribute('data-song-id');
+        this.playSong(this.normalizeSongId(songId));
       });
     });
 
     container.querySelectorAll('.song-card').forEach(card => {
       card.addEventListener('click', (e) => {
         if (!e.target.closest('.play-overlay') && !e.target.closest('.song-card-like')) {
-          const songId = parseInt(card.getAttribute('data-song-id'));
-          this.playSong(songId);
+          const songId = card.getAttribute('data-song-id');
+          this.playSong(this.normalizeSongId(songId));
         }
       });
     });
@@ -178,8 +199,8 @@ class UIManager {
     container.querySelectorAll('[data-like-song-id]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const songId = parseInt(btn.getAttribute('data-like-song-id'));
-        this.likeManager.toggleLike(songId);
+        const songId = btn.getAttribute('data-like-song-id');
+        this.likeManager.toggleLike(this.normalizeSongId(songId));
       });
     });
   }
@@ -191,8 +212,8 @@ class UIManager {
     container.querySelectorAll('.song-list-item').forEach(item => {
       item.addEventListener('click', (e) => {
         if (!e.target.closest('.song-list-actions')) {
-          const songId = parseInt(item.getAttribute('data-song-id'));
-          this.playSong(songId);
+          const songId = item.getAttribute('data-song-id');
+          this.playSong(this.normalizeSongId(songId));
         }
       });
     });
@@ -201,8 +222,8 @@ class UIManager {
     container.querySelectorAll('[data-like-song-id]').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const songId = parseInt(btn.getAttribute('data-like-song-id'));
-        this.likeManager.toggleLike(songId);
+        const songId = btn.getAttribute('data-like-song-id');
+        this.likeManager.toggleLike(this.normalizeSongId(songId));
       });
     });
   }
@@ -233,7 +254,7 @@ class UIManager {
    * Play a song
    */
   async playSong(songId) {
-    const song = this.dataManager.getSongById(songId);
+    const song = this.dataManager.getSongById(this.normalizeSongId(songId));
     if (!song) return;
 
     // Get all songs for playlist
