@@ -116,7 +116,7 @@ music-streaming-app/
 
 ## 🚀 Deployment
 
-### Deploy Backend (Railway/Render/Heroku)
+### Deploy Backend (Render)
 
 1. **Push to GitHub**
 ```bash
@@ -125,12 +125,12 @@ git commit -m "Ready for deployment"
 git push origin main
 ```
 
-2. **Connect to Railway/Render**
+2. **Connect to Render**
    - Import from GitHub
    - Add environment variables
    - Deploy!
 
-### Deploy Frontend (Vercel/Netlify)
+### Deploy Frontend (Render)
 
 1. **Connect repository**
 2. **Build settings**: None needed (static files)
