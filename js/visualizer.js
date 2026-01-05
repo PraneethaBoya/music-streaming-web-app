@@ -382,56 +382,46 @@ class AudioVisualizer {
     const amp = this.baseAmplitude + (this.maxAmplitude - this.baseAmplitude) * intensity;
     const softAlpha = this.alpha;
 
-    // Neon blue gradient stroke
+    // Neon blue gradient for barcode
     const gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, `rgba(79, 195, 247, ${0.95 * softAlpha})`);
-    gradient.addColorStop(0.55, `rgba(33, 150, 243, ${0.95 * softAlpha})`);
-    gradient.addColorStop(1, `rgba(3, 169, 244, ${0.95 * softAlpha})`);
+    gradient.addColorStop(0, `rgba(79, 195, 247, ${1.0 * softAlpha})`);
+    gradient.addColorStop(0.55, `rgba(33, 150, 243, ${1.0 * softAlpha})`);
+    gradient.addColorStop(1, `rgba(3, 169, 244, ${1.0 * softAlpha})`);
 
-    // Use additive blending for neon layering
     ctx.globalCompositeOperation = 'lighter';
 
-    // Smooth time-domain sample mapping across width
-    const bufferLen = this.dataArray.length;
-    const step = Math.max(3, Math.floor(this.pointStep));
-    const points = Math.floor(width / step);
+    // Use frequency data to create a Spotify-style barcode
+    const bins = this.freqArray && this.freqArray.length ? this.freqArray.length : 0;
+    if (bins === 0) return;
 
-    for (let layerIndex = 0; layerIndex < this.waveLayers.length; layerIndex++) {
-      const layer = this.waveLayers[layerIndex];
-      const phase = this.t * layer.speed;
-      const layerAmp = amp * layer.amp;
+    const barCount = Math.max(48, Math.min(120, Math.floor(width / 6)));
+    const gap = 2;
+    const barW = Math.max(2, Math.floor((width - (barCount - 1) * gap) / barCount));
+    const midY = centerY;
 
-      // Build path
+    // Smooth motion left-to-right by sampling a moving window
+    const scroll = Math.floor(this.t * 2) % bins;
+    const glowBoost = 1 + (this.beat * 2.2);
+
+    ctx.strokeStyle = gradient;
+    ctx.lineCap = 'round';
+    ctx.globalAlpha = 0.95 * softAlpha;
+    ctx.shadowBlur = 18 * glowBoost;
+    ctx.shadowColor = `rgba(79, 195, 247, ${0.65 * softAlpha})`;
+
+    for (let i = 0; i < barCount; i++) {
+      const binIndex = (scroll + Math.floor((i / barCount) * bins)) % bins;
+      const v = this.freqArray[binIndex] / 255;
+      const h = Math.max(4, (height * 0.42) * (0.18 + v * 0.9));
+      const x = i * (barW + gap) + barW / 2;
+
+      ctx.lineWidth = barW;
       ctx.beginPath();
-
-      for (let p = 0; p <= points; p++) {
-        const x = p * step;
-        const normX = x / width;
-
-        // Sample time-domain data and map to [-1..1]
-        const dataIndex = Math.min(bufferLen - 1, Math.floor(normX * bufferLen));
-        const td = (this.dataArray[dataIndex] - 128) / 128;
-
-        // A sine foundation + time-domain modulation (smooth, no sharp bars)
-        const sine = Math.sin((normX * Math.PI * 2 * layer.freq) + phase);
-        const wobble = td * 0.75;
-        const y = centerY + (sine + wobble) * layerAmp;
-
-        if (p === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-
-      // Glow settings per layer (beat-reactive)
-      ctx.strokeStyle = gradient;
-      ctx.lineWidth = layer.thickness;
-      ctx.globalAlpha = layer.opacity * softAlpha;
-      const glowBoost = 1 + (this.beat * 1.8);
-      ctx.shadowBlur = layer.blur * glowBoost;
-      ctx.shadowColor = `rgba(79, 195, 247, ${0.55 * softAlpha})`;
+      ctx.moveTo(x, midY - h * 0.5);
+      ctx.lineTo(x, midY + h * 0.5);
       ctx.stroke();
     }
 
-    // Reset alpha/composite
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
     ctx.globalCompositeOperation = 'source-over';

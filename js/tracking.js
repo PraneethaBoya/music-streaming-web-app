@@ -119,6 +119,14 @@ class TrackingManager {
     // In a real app, this would consider time-based trends
     return this.getMostPlayed(limit);
   }
+
+  clearHistory() {
+    const user = this.profileManager.getCurrentUser();
+    user.recentlyPlayed = [];
+    user.playCounts = {};
+    this.profileManager.currentUser = user;
+    this.profileManager.saveUser();
+  }
 }
 
 // Export singleton instance

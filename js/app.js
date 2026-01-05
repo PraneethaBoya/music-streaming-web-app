@@ -99,15 +99,37 @@ function initLandingPage() {
  * Initialize Home Page
  */
 async function initHomePage() {
+  const allSongs = (dataManager.getSongs && dataManager.getSongs()) || [];
+  const isEmptyCatalog = !Array.isArray(allSongs) || allSongs.length === 0;
+
+  if (isEmptyCatalog) {
+    try {
+      if (window.trackingManager && typeof window.trackingManager.clearHistory === 'function') {
+        window.trackingManager.clearHistory();
+      }
+    } catch (e) {
+    }
+
+    uiManager.renderSongsGrid([], 'recently-listened');
+    const mostly = document.getElementById('mostly-listened');
+    if (mostly) mostly.innerHTML = '<p class="loading">No songs available</p>';
+    uiManager.renderSongsGrid([], 'trending');
+    uiManager.renderSongsGrid([], 'new-releases');
+    uiManager.renderArtistsGrid([], 'popular-artists');
+    uiManager.renderPlaylistsGrid([], 'artist-playlists');
+
+    const playlistsContainer = document.getElementById('recommended-playlists');
+    if (playlistsContainer) playlistsContainer.innerHTML = '<p class="loading">No songs available</p>';
+    return;
+  }
+
   // Load and render recently listened (from tracking)
   const recentlyListenedIds = trackingManager.getRecentlyPlayed(12);
   const recentlyListened = dataManager.getSongsByIds(recentlyListenedIds);
   if (recentlyListened.length > 0) {
     uiManager.renderSongsGrid(recentlyListened, 'recently-listened');
   } else {
-    // Fallback to static data
-    const fallback = dataManager.getRecentlyPlayed();
-    uiManager.renderSongsGrid(fallback, 'recently-listened');
+    uiManager.renderSongsGrid([], 'recently-listened');
   }
 
   // Load and render mostly listened
@@ -126,9 +148,7 @@ async function initHomePage() {
   if (trending.length > 0) {
     uiManager.renderSongsGrid(trending, 'trending');
   } else {
-    // Fallback to static data
-    const fallback = dataManager.getTrending();
-    uiManager.renderSongsGrid(fallback, 'trending');
+    uiManager.renderSongsGrid([], 'trending');
   }
 
   // Load and render new releases

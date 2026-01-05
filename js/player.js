@@ -44,6 +44,7 @@ class MusicPlayer {
       <div class="now-playing-content">
         <div id="now-playing-cover-wrap" class="now-playing-cover-wrap">
           <img id="now-playing-cover" class="cover-image" src="${this.getFallbackCover()}" alt="" />
+          <img id="now-playing-artist-photo" class="now-playing-artist-photo" src="assets/artists/default-artist.jpg" alt="" />
           <canvas id="now-playing-visualizer" class="sonic-waves"></canvas>
         </div>
 
@@ -598,6 +599,7 @@ class MusicPlayer {
     const overlay = document.getElementById('now-playing-overlay');
     if (overlay) {
       const coverEl = document.getElementById('now-playing-cover');
+      const artistPhotoEl = document.getElementById('now-playing-artist-photo');
       const titleEl2 = document.getElementById('now-playing-title');
       const artistEl2 = document.getElementById('now-playing-artist');
       const likeEl = document.getElementById('now-playing-like');
@@ -610,6 +612,26 @@ class MusicPlayer {
         };
         coverEl.src = cover && cover.trim() !== '' ? cover : this.getFallbackCover();
         coverEl.alt = this.currentSong.title || '';
+      }
+
+      if (artistPhotoEl) {
+        const fallbackArtist = 'assets/artists/default-artist.jpg';
+        artistPhotoEl.onerror = () => {
+          artistPhotoEl.onerror = null;
+          artistPhotoEl.src = fallbackArtist;
+        };
+
+        let artistImage = '';
+        try {
+          const dm = window.dataManager;
+          const artists = dm && typeof dm.getArtists === 'function' ? dm.getArtists() : [];
+          const match = Array.isArray(artists) ? artists.find(a => String(a?.name || '').toLowerCase() === String(this.currentSong.artist || '').toLowerCase()) : null;
+          artistImage = match && match.image ? String(match.image) : '';
+        } catch (e) {
+        }
+
+        artistPhotoEl.src = artistImage && artistImage.trim() !== '' ? artistImage : fallbackArtist;
+        artistPhotoEl.alt = this.currentSong.artist || '';
       }
       if (titleEl2) titleEl2.textContent = this.currentSong.title || '';
       if (artistEl2) artistEl2.textContent = this.currentSong.artist || '';
