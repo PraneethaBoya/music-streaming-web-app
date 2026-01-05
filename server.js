@@ -354,6 +354,7 @@ app.post('/api/upload/audio', (req, res) => {
     if (err) {
       return res.status(400).json({ error: err.message || 'Upload failed' });
     }
+
     if (!req.file) {
       return res.status(400).json({ error: 'No audio file uploaded' });
     }
@@ -362,6 +363,51 @@ app.post('/api/upload/audio', (req, res) => {
   });
 });
 
+app.get('/api/admin/db-status', async (req, res) => {
+  try {
+    const secret = req.headers['x-admin-secret'];
+    if (!process.env.ADMIN_SECRET || String(secret || '') !== String(process.env.ADMIN_SECRET)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    if (!pool) {
+      const local = getLocalData();
+      return res.json({
+        ok: true,
+        dbConfigured: false,
+        counts: {
+          artists: Array.isArray(local?.artists) ? local.artists.length : 0,
+          albums: Array.isArray(local?.albums) ? local.albums.length : 0,
+          songs: Array.isArray(local?.songs) ? local.songs.length : 0,
+          playlists: Array.isArray(local?.playlists) ? local.playlists.length : 0
+        }
+      });
+    }
+
+    const [artists, albums, songs, playlists] = await Promise.all([
+      pool.query('SELECT COUNT(*)::int AS count FROM artists'),
+      pool.query('SELECT COUNT(*)::int AS count FROM albums'),
+      pool.query('SELECT COUNT(*)::int AS count FROM songs'),
+      pool.query('SELECT COUNT(*)::int AS count FROM playlists')
+    ]);
+
+    res.json({
+      ok: true,
+      dbConfigured: true,
+      counts: {
+        artists: artists.rows[0]?.count ?? 0,
+        albums: albums.rows[0]?.count ?? 0,
+        songs: songs.rows[0]?.count ?? 0,
+        playlists: playlists.rows[0]?.count ?? 0
+      }
+    });
+  } catch (error) {
+    console.error('Error checking db status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Upload song endpoint
 app.post('/api/upload/song', (req, res) => {
   if (!ensureDb(res)) return;
 
