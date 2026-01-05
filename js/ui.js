@@ -11,6 +11,20 @@ class UIManager {
     this.trackingManager = trackingManager;
   }
 
+  getFallbackCover() {
+    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">'
+        + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+        + '<stop offset="0" stop-color="#1b1b1b"/><stop offset="1" stop-color="#0a0a0a"/>'
+        + '</linearGradient></defs>'
+        + '<rect width="800" height="800" fill="url(#g)"/>'
+        + '<circle cx="400" cy="400" r="220" fill="#111" stroke="#ff2d8d" stroke-width="10"/>'
+        + '<circle cx="400" cy="400" r="18" fill="#ff2d8d"/>'
+        + '<text x="400" y="710" fill="#bdbdbd" font-size="44" font-family="Inter, Arial" text-anchor="middle">MusicStream</text>'
+      + '</svg>'
+    );
+  }
+
   normalizeSongId(songId) {
     return songId != null ? String(songId) : '';
   }
@@ -19,7 +33,7 @@ class UIManager {
     const cover = song?.cover || song?.coverImage || '';
     return cover && String(cover).trim() !== ''
       ? cover
-      : 'https://via.placeholder.com/300x300/111111/FFFFFF?text=Music';
+      : this.getFallbackCover();
   }
 
   getDurationText(song) {
@@ -35,10 +49,11 @@ class UIManager {
   renderSongCard(song) {
     const likeBtn = this.likeManager.renderLikeButton(this.normalizeSongId(song?.id), 'small');
     const coverSrc = this.getCoverSrc(song);
+    const fallback = this.getFallbackCover();
     return `
       <div class="song-card" data-song-id="${song.id}">
         <div class="song-card-image-wrapper">
-          <img src="${coverSrc}" alt="${song?.title || ''}" class="song-card-image">
+          <img src="${coverSrc}" alt="${song?.title || ''}" class="song-card-image" onerror="this.onerror=null;this.src='${fallback}'">
           <div class="play-overlay">
             <button class="play-song-btn" data-song-id="${song.id}">
               <i class="icon-play">▶️</i>
@@ -61,11 +76,12 @@ class UIManager {
     const number = index !== null ? index + 1 : '';
     const likeBtn = this.likeManager.renderLikeButton(this.normalizeSongId(song?.id), 'small');
     const coverSrc = this.getCoverSrc(song);
+    const fallback = this.getFallbackCover();
     const durationText = this.getDurationText(song);
     return `
       <div class="song-list-item" data-song-id="${song.id}">
         ${number ? `<div class="song-list-number">${number}</div>` : ''}
-        <img src="${coverSrc}" alt="${song?.title || ''}" class="song-list-image">
+        <img src="${coverSrc}" alt="${song?.title || ''}" class="song-list-image" onerror="this.onerror=null;this.src='${fallback}'">
         <div class="song-list-info">
           <div class="song-list-title">${song.title}</div>
           <div class="song-list-artist">${song.artist}</div>

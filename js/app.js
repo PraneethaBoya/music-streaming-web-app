@@ -7,6 +7,7 @@
 if (typeof musicPlayer !== 'undefined') window.musicPlayer = musicPlayer;
 if (typeof trackingManager !== 'undefined') window.trackingManager = trackingManager;
 if (typeof audioVisualizer !== 'undefined') window.audioVisualizer = audioVisualizer;
+if (typeof likeManager !== 'undefined') window.likeManager = likeManager;
 
 // Wait for DOM to be ready
 document.addEventListener('DOMContentLoaded', async () => {
@@ -36,6 +37,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (error) {
     console.error('Error loading data:', error);
+  }
+
+  try {
+    if (typeof musicPlayer !== 'undefined' && typeof musicPlayer.restoreState === 'function' && typeof dataManager !== 'undefined') {
+      await musicPlayer.restoreState(dataManager);
+    }
+  } catch (e) {
   }
 
   // Initialize profile manager (must be first to set up user)

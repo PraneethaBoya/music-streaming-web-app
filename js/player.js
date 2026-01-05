@@ -20,6 +20,20 @@ class MusicPlayer {
     this.init();
   }
 
+  getFallbackCover() {
+    return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">'
+        + '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+        + '<stop offset="0" stop-color="#1b1b1b"/><stop offset="1" stop-color="#0a0a0a"/>'
+        + '</linearGradient></defs>'
+        + '<rect width="800" height="800" fill="url(#g)"/>'
+        + '<circle cx="400" cy="400" r="220" fill="#111" stroke="#ff2d8d" stroke-width="10"/>'
+        + '<circle cx="400" cy="400" r="18" fill="#ff2d8d"/>'
+        + '<text x="400" y="710" fill="#bdbdbd" font-size="44" font-family="Inter, Arial" text-anchor="middle">MusicStream</text>'
+      + '</svg>'
+    );
+  }
+
   getSongAudioUrl(song) {
     return (song && (song.audio || song.audioUrl)) ? String(song.audio || song.audioUrl) : '';
   }
@@ -47,7 +61,7 @@ class MusicPlayer {
     overlay.innerHTML = `
       <div id="now-playing-close" style="position:absolute;top:16px;right:16px;font-size:28px;cursor:pointer;line-height:1;">✕</div>
       <div style="max-width:520px;margin:48px auto 0;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;">
-        <img id="now-playing-cover" src="" alt="" style="width:min(76vw,360px);height:min(76vw,360px);object-fit:cover;border-radius:18px;box-shadow:0 20px 80px rgba(0,0,0,0.55);" />
+        <img id="now-playing-cover" src="${this.getFallbackCover()}" alt="" style="width:min(76vw,360px);height:min(76vw,360px);object-fit:cover;border-radius:18px;box-shadow:0 20px 80px rgba(0,0,0,0.55);" />
         <div style="width:100%;">
           <div id="now-playing-title" style="font-size:22px;font-weight:700;"> </div>
           <div id="now-playing-artist" style="margin-top:6px;opacity:0.8;"> </div>
@@ -89,6 +103,7 @@ class MusicPlayer {
 
     this.audio.addEventListener('timeupdate', () => {
       this.updateProgress();
+      this.saveState();
     });
 
     this.audio.addEventListener('play', () => {
@@ -99,6 +114,8 @@ class MusicPlayer {
 
       const overlay = document.getElementById('now-playing-overlay');
       if (overlay) overlay.style.display = 'block';
+
+      this.saveState();
     });
 
     this.audio.addEventListener('pause', () => {
@@ -106,6 +123,8 @@ class MusicPlayer {
       if (window.audioVisualizer) {
         window.audioVisualizer.stop();
       }
+
+      this.saveState();
     });
 
     this.audio.addEventListener('ended', () => {
@@ -114,6 +133,8 @@ class MusicPlayer {
       if (window.audioVisualizer) {
         window.audioVisualizer.stop();
       }
+
+      this.saveState();
     });
 
     this.audio.addEventListener('error', (e) => {
@@ -123,6 +144,8 @@ class MusicPlayer {
       if (window.audioVisualizer) {
         window.audioVisualizer.stop();
       }
+
+      this.saveState();
     });
 
     // Load volume from localStorage
@@ -143,6 +166,8 @@ class MusicPlayer {
     }
 
     this.currentSong = song;
+
+    this.saveState();
     
     if (playlist) {
       this.setPlaylist(playlist);
@@ -160,6 +185,8 @@ class MusicPlayer {
       this.audio.src = audioUrl;
       this.audio.load();
       this.updateUI();
+
+      this.saveState();
       
       // Track song play
       if (window.trackingManager) {
@@ -170,6 +197,75 @@ class MusicPlayer {
     } catch (error) {
       console.error('Error loading song:', error);
       this.handleError();
+    }
+  }
+
+  saveState() {
+    try {
+      const song = this.currentSong;
+      if (!song) return;
+      const payload = {
+        id: song?.id != null ? String(song.id) : null,
+        title: song?.title || '',
+        artist: song?.artist || '',
+        album: song?.album || '',
+        cover: this.getSongCoverUrl(song) || '',
+        audio: this.getSongAudioUrl(song) || '',
+        time: Number.isFinite(this.audio.currentTime) ? this.audio.currentTime : 0,
+        isPlaying: !!this.isPlaying
+      };
+      sessionStorage.setItem('musicPlayerState', JSON.stringify(payload));
+    } catch (e) {
+    }
+  }
+
+  async restoreState(dataManager) {
+    try {
+      const raw = sessionStorage.getItem('musicPlayerState');
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      if (!state || !state.audio) return;
+
+      let song = null;
+      if (dataManager && typeof dataManager.getSongById === 'function' && state.id) {
+        song = dataManager.getSongById(String(state.id));
+      }
+
+      if (!song) {
+        song = {
+          id: state.id || 'restored',
+          title: state.title || '',
+          artist: state.artist || '',
+          album: state.album || '',
+          cover: state.cover || '',
+          audio: state.audio || ''
+        };
+      }
+
+      const wasPlaying = !!state.isPlaying;
+      const t = Number.isFinite(state.time) ? state.time : 0;
+
+      this.currentSong = song;
+      this.audio.src = state.audio;
+      this.audio.load();
+      this.updateUI();
+
+      const seekTo = () => {
+        try {
+          if (t > 0 && Number.isFinite(this.audio.duration)) {
+            this.audio.currentTime = Math.min(t, Math.max(0, this.audio.duration - 0.25));
+          }
+        } catch (e) {
+        }
+      };
+
+      this.audio.addEventListener('loadedmetadata', seekTo, { once: true });
+      this.audio.addEventListener('canplay', seekTo, { once: true });
+
+      if (wasPlaying) {
+        this.play();
+      }
+    } catch (e) {
     }
   }
 
@@ -390,7 +486,7 @@ class MusicPlayer {
     const nowPlayingInfo = document.querySelector('.player-now-playing-info');
 
     if (imageEl) {
-      imageEl.src = this.getSongCoverUrl(this.currentSong) || '';
+      imageEl.src = this.getSongCoverUrl(this.currentSong) || this.getFallbackCover();
       imageEl.style.display = 'block';
     }
     if (titleEl) titleEl.textContent = this.currentSong.title;
@@ -448,12 +544,11 @@ class MusicPlayer {
     const playBtn = document.getElementById('play-btn');
     if (!playBtn) return;
 
-    const icon = playBtn.querySelector('i') || playBtn;
     if (this.isPlaying) {
-      icon.className = 'icon-pause';
+      playBtn.innerHTML = '<i class="icon-pause">⏸️</i>';
       playBtn.setAttribute('aria-label', 'Pause');
     } else {
-      icon.className = 'icon-play';
+      playBtn.innerHTML = '<i class="icon-play">▶️</i>';
       playBtn.setAttribute('aria-label', 'Play');
     }
   }
