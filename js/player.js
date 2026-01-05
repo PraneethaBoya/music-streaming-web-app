@@ -61,15 +61,15 @@ class MusicPlayer {
     overlay.innerHTML = `
       <div id="now-playing-close" style="position:absolute;top:16px;right:16px;font-size:28px;cursor:pointer;line-height:1;">✕</div>
       <div style="max-width:520px;margin:48px auto 0;display:flex;flex-direction:column;gap:16px;align-items:center;text-align:center;">
-        <img id="now-playing-cover" src="${this.getFallbackCover()}" alt="" style="width:min(76vw,360px);height:min(76vw,360px);object-fit:cover;border-radius:18px;box-shadow:0 20px 80px rgba(0,0,0,0.55);" />
+        <div id="now-playing-cover-wrap" style="position:relative;width:min(76vw,360px);height:min(76vw,360px);border-radius:18px;overflow:hidden;box-shadow:0 20px 80px rgba(0,0,0,0.55);">
+          <img id="now-playing-cover" src="${this.getFallbackCover()}" alt="" style="position:relative;z-index:1;width:100%;height:100%;object-fit:cover;object-position:center;display:block;" />
+          <canvas id="now-playing-visualizer" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:2;pointer-events:none;display:block;"></canvas>
+        </div>
         <div style="width:100%;">
           <div id="now-playing-title" style="font-size:22px;font-weight:700;"> </div>
           <div id="now-playing-artist" style="margin-top:6px;opacity:0.8;"> </div>
         </div>
         <div id="now-playing-like"></div>
-        <div style="width:100%;height:160px;border-radius:16px;overflow:hidden;">
-          <canvas id="now-playing-visualizer" style="width:100%;height:100%;display:block;"></canvas>
-        </div>
       </div>
     `;
 
@@ -488,6 +488,10 @@ class MusicPlayer {
     const nowPlayingInfo = document.querySelector('.player-now-playing-info');
 
     if (imageEl) {
+      imageEl.onerror = () => {
+        imageEl.onerror = null;
+        imageEl.src = this.getFallbackCover();
+      };
       imageEl.src = this.getSongCoverUrl(this.currentSong) || this.getFallbackCover();
       imageEl.style.display = 'block';
     }
@@ -510,7 +514,11 @@ class MusicPlayer {
 
       const cover = this.getSongCoverUrl(this.currentSong);
       if (coverEl) {
-        coverEl.src = cover && cover.trim() !== '' ? cover : 'https://via.placeholder.com/600x600/111111/FFFFFF?text=Music';
+        coverEl.onerror = () => {
+          coverEl.onerror = null;
+          coverEl.src = this.getFallbackCover();
+        };
+        coverEl.src = cover && cover.trim() !== '' ? cover : this.getFallbackCover();
         coverEl.alt = this.currentSong.title || '';
       }
       if (titleEl2) titleEl2.textContent = this.currentSong.title || '';
@@ -532,7 +540,7 @@ class MusicPlayer {
         try {
           window.audioVisualizer.canvas = canvas;
           window.audioVisualizer.ctx = canvas.getContext('2d');
-          if (typeof window.audioVisualizer.resize === 'function') window.audioVisualizer.resize();
+          if (typeof window.audioVisualizer.resizeCanvas === 'function') window.audioVisualizer.resizeCanvas();
         } catch (e) {
         }
       }

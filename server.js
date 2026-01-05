@@ -161,6 +161,77 @@ const uploadSong = multer({
   }
 });
 
+app.post('/api/admin/delete-song', async (req, res) => {
+  try {
+    if (!ensureDb(res)) return;
+
+    const secret = req.headers['x-admin-secret'];
+    if (!process.env.ADMIN_SECRET || String(secret || '') !== String(process.env.ADMIN_SECRET)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const title = req.body?.title != null ? String(req.body.title).trim() : '';
+    const artist = req.body?.artist != null ? String(req.body.artist).trim() : '';
+
+    if (!title) return res.status(400).json({ error: 'title is required' });
+
+    const params = [title];
+    let where = 'LOWER(s.title) = LOWER($1)';
+    if (artist) {
+      params.push(artist);
+      where += ' AND LOWER(a.name) = LOWER($2)';
+    }
+
+    const idsRes = await pool.query(
+      `SELECT s.id
+       FROM songs s
+       LEFT JOIN artists a ON a.id = s.artist_id
+       WHERE ${where}`,
+      params
+    );
+
+    if (idsRes.rows.length === 0) {
+      return res.json({ deleted: 0 });
+    }
+
+    const ids = idsRes.rows.map(r => r.id);
+    await pool.query('DELETE FROM songs WHERE id = ANY($1::uuid[])', [ids]);
+    res.json({ deleted: ids.length });
+  } catch (error) {
+    console.error('Error deleting song:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/api/admin/duplicates', async (req, res) => {
+  try {
+    if (!ensureDb(res)) return;
+
+    const secret = req.headers['x-admin-secret'];
+    if (!process.env.ADMIN_SECRET || String(secret || '') !== String(process.env.ADMIN_SECRET)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const result = await pool.query(
+      `SELECT
+        LOWER(s.title) AS title,
+        LOWER(a.name) AS artist,
+        s.audio_url,
+        COUNT(*) AS count,
+        ARRAY_AGG(s.id ORDER BY s.created_at DESC) AS ids
+      FROM songs s
+      LEFT JOIN artists a ON a.id = s.artist_id
+      GROUP BY LOWER(s.title), LOWER(a.name), s.audio_url
+      HAVING COUNT(*) > 1
+      ORDER BY COUNT(*) DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching duplicates:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Test database connection
 if (pool) {
   pool.on('connect', () => {

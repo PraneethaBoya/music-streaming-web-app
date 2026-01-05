@@ -9,6 +9,51 @@ class DataManager {
     this.loaded = false;
   }
 
+  normalizeKeyPart(value) {
+    return String(value || '').trim().toLowerCase();
+  }
+
+  buildDedupeKey(song) {
+    const title = this.normalizeKeyPart(song?.title);
+    const artist = this.normalizeKeyPart(song?.artist);
+    const audioUrl = this.normalizeKeyPart(song?.audioUrl || song?.audio);
+    return `${title}||${artist}||${audioUrl}`;
+  }
+
+  isBlockedSong(song) {
+    const title = this.normalizeKeyPart(song?.title);
+    return title === 'em sandheham' || title === 'em sandhem';
+  }
+
+  cleanClientCaches(removedSongIds) {
+    try {
+      const raw = sessionStorage.getItem('musicPlayerState');
+      if (raw) {
+        const state = JSON.parse(raw);
+        const id = state?.id != null ? String(state.id) : '';
+        const title = this.normalizeKeyPart(state?.title);
+        if ((id && removedSongIds.has(id)) || title === 'em sandheham' || title === 'em sandhem') {
+          sessionStorage.removeItem('musicPlayerState');
+        }
+      }
+    } catch (e) {
+    }
+
+    try {
+      const userRaw = localStorage.getItem('musicStreamUser');
+      if (userRaw) {
+        const user = JSON.parse(userRaw);
+        const liked = Array.isArray(user?.likedSongs) ? user.likedSongs.map(s => String(s)) : [];
+        const filtered = liked.filter(id => !removedSongIds.has(String(id)));
+        if (filtered.length !== liked.length) {
+          user.likedSongs = filtered;
+          localStorage.setItem('musicStreamUser', JSON.stringify(user));
+        }
+      }
+    } catch (e) {
+    }
+  }
+
   normalizeSong(raw) {
     const id = raw?.id != null ? String(raw.id) : '';
     const title = raw?.title != null ? String(raw.title) : '';
@@ -47,24 +92,77 @@ class DataManager {
       const apiRes = await fetch(`${apiBaseUrl}/songs`).catch(() => null);
       if (apiRes && apiRes.ok) {
         const songs = await apiRes.json();
+        const normalized = Array.isArray(songs) ? songs.map(s => this.normalizeSong(s)) : [];
+        const removedSongIds = new Set();
+        const seen = new Set();
+        const uniqueSongs = [];
+
+        for (const song of normalized) {
+          if (this.isBlockedSong(song)) {
+            if (song?.id != null) removedSongIds.add(String(song.id));
+            continue;
+          }
+          const key = this.buildDedupeKey(song);
+          if (seen.has(key)) {
+            if (song?.id != null) removedSongIds.add(String(song.id));
+            continue;
+          }
+          seen.add(key);
+          uniqueSongs.push(song);
+        }
+
         this.data = {
-          songs: Array.isArray(songs) ? songs.map(s => this.normalizeSong(s)) : [],
+          songs: uniqueSongs,
           artists: [],
           albums: [],
           playlists: []
         };
+
+        if (removedSongIds.size > 0) {
+          this.cleanClientCaches(removedSongIds);
+        }
+
         this.loaded = true;
         return this.data;
       }
 
       const response = await fetch('./data.json');
       const local = await response.json();
+      const normalizedSongs = Array.isArray(local?.songs) ? local.songs.map(s => this.normalizeSong(s)) : [];
+      const removedSongIds = new Set();
+      const seen = new Set();
+      const uniqueSongs = [];
+
+      for (const song of normalizedSongs) {
+        if (this.isBlockedSong(song)) {
+          if (song?.id != null) removedSongIds.add(String(song.id));
+          continue;
+        }
+        const key = this.buildDedupeKey(song);
+        if (seen.has(key)) {
+          if (song?.id != null) removedSongIds.add(String(song.id));
+          continue;
+        }
+        seen.add(key);
+        uniqueSongs.push(song);
+      }
+
+      const songIdSet = new Set(uniqueSongs.map(s => String(s.id)));
+      const playlists = Array.isArray(local?.playlists) ? local.playlists.map(p => {
+        const songs = Array.isArray(p?.songs) ? p.songs.map(id => String(id)).filter(id => songIdSet.has(id)) : [];
+        return { ...p, songs };
+      }) : [];
+
       this.data = {
-        songs: Array.isArray(local?.songs) ? local.songs.map(s => this.normalizeSong(s)) : [],
+        songs: uniqueSongs,
         artists: Array.isArray(local?.artists) ? local.artists : [],
         albums: Array.isArray(local?.albums) ? local.albums : [],
-        playlists: Array.isArray(local?.playlists) ? local.playlists : []
+        playlists
       };
+
+      if (removedSongIds.size > 0) {
+        this.cleanClientCaches(removedSongIds);
+      }
       this.loaded = true;
       return this.data;
     } catch (error) {

@@ -94,15 +94,19 @@ class AudioVisualizer {
   resizeCanvas() {
     if (!this.canvas) return;
 
-    // Canvas is positioned fixed; width follows viewport
-    const cssWidth = window.innerWidth;
-    const cssHeight = parseFloat(getComputedStyle(this.canvas).height) || 200;
+    const rect = this.canvas.getBoundingClientRect();
+    const cssWidth = rect.width || parseFloat(getComputedStyle(this.canvas).width) || window.innerWidth;
+    const cssHeight = rect.height || parseFloat(getComputedStyle(this.canvas).height) || 200;
 
     this.dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
     this.canvas.width = Math.floor(cssWidth * this.dpr);
     this.canvas.height = Math.floor(cssHeight * this.dpr);
-    this.canvas.style.width = `${cssWidth}px`;
-    this.canvas.style.height = `${cssHeight}px`;
+    if (!String(this.canvas.style.width || '').includes('%')) {
+      this.canvas.style.width = `${cssWidth}px`;
+    }
+    if (!String(this.canvas.style.height || '').includes('%')) {
+      this.canvas.style.height = `${cssHeight}px`;
+    }
 
     // Use DPR scaling so drawing uses CSS pixels
     if (this.ctx) {
