@@ -385,8 +385,15 @@ class AudioVisualizer {
     const volumeBoost = 0.35 + this.volume * 1.15;
     const intensity = Math.min(1, (this.energy * 1.1 + this.beat * 0.9)) * volumeBoost;
 
-    const amp = this.baseAmplitude + (this.maxAmplitude - this.baseAmplitude) * intensity;
     const softAlpha = this.alpha;
+
+    const glowBoost = 1 + (this.beat * 2.0);
+
+    const gradient = ctx.createLinearGradient(0, 0, width, 0);
+    gradient.addColorStop(0, `rgba(0, 229, 255, ${0.95 * softAlpha})`);
+    gradient.addColorStop(0.45, `rgba(0, 255, 163, ${0.95 * softAlpha})`);
+    gradient.addColorStop(0.75, `rgba(255, 0, 122, ${0.95 * softAlpha})`);
+    gradient.addColorStop(1, `rgba(255, 176, 0, ${0.95 * softAlpha})`);
 
     // Spotify-style barcode waveform (frequency-driven vertical bars)
     const bins = this.freqArray && this.freqArray.length ? this.freqArray.length : 0;
@@ -399,9 +406,10 @@ class AudioVisualizer {
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 0.95 * softAlpha;
-    ctx.strokeStyle = '#111';
+    ctx.strokeStyle = gradient;
     ctx.lineCap = 'round';
-    ctx.shadowBlur = 0;
+    ctx.shadowBlur = 10 * glowBoost;
+    ctx.shadowColor = `rgba(0, 229, 255, ${0.35 * softAlpha})`;
 
     for (let i = 0; i < barCount; i++) {
       const binIndex = (scroll + Math.floor((i / barCount) * bins)) % bins;
@@ -418,6 +426,7 @@ class AudioVisualizer {
     }
 
     ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
   }
 
   /**
