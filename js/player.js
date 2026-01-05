@@ -228,6 +228,48 @@ class MusicPlayer {
       const state = JSON.parse(raw);
       if (!state || !state.audio) return;
 
+      const looksLikeUploadsPath = (value) => {
+        try {
+          const s = String(value || '').trim();
+          if (!s) return false;
+          if (s.startsWith('/uploads/')) return true;
+          const u = new URL(s, window.location.origin);
+          return u.pathname.startsWith('/uploads/');
+        } catch (e) {
+          return String(value || '').trim().startsWith('/uploads/');
+        }
+      };
+
+      const resourceExists = async (url) => {
+        try {
+          const res = await fetch(url, { method: 'HEAD', cache: 'no-store' }).catch(() => null);
+          if (res && res.ok) return true;
+
+          // Some hosts don't support HEAD; fallback to GET with range.
+          const res2 = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, cache: 'no-store' }).catch(() => null);
+          return !!(res2 && (res2.ok || res2.status === 206));
+        } catch (e) {
+          return false;
+        }
+      };
+
+      // If we restored an ephemeral /uploads/* URL from a previous session, validate it.
+      // On Render free tier, uploaded files may no longer exist -> clear saved state.
+      const savedAudio = String(state.audio || '').trim();
+      if (looksLikeUploadsPath(savedAudio)) {
+        const ok = await resourceExists(savedAudio);
+        if (!ok) {
+          try { sessionStorage.removeItem('musicPlayerState'); } catch (e) {}
+          this.currentSong = null;
+          this.isPlaying = false;
+          this.audio.pause();
+          this.audio.removeAttribute('src');
+          this.audio.load();
+          this.updateUI();
+          return;
+        }
+      }
+
       let song = null;
       if (dataManager && typeof dataManager.getSongById === 'function' && state.id) {
         song = dataManager.getSongById(String(state.id));
