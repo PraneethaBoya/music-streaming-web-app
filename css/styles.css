@@ -1770,18 +1770,19 @@ img {
  }
 
  .sonic-waves {
-   position: relative;
-   width: min(70%, 280px);
-   height: 56px;
-   margin-top: 12px;
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
    z-index: 3;
    opacity: 0;
    pointer-events: none;
    display: block;
-   background: rgba(0, 0, 0, 0.35);
-   border-radius: 14px;
-   border: 1px solid rgba(255, 255, 255, 0.14);
-   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+   background: transparent;
+   border: none;
+   box-shadow: none;
+   border-radius: 18px;
  }
 
  .now-playing-artist-photo {
