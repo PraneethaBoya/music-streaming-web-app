@@ -153,6 +153,8 @@ class MusicPlayer {
     if (savedVolume !== null) {
       this.setVolume(parseFloat(savedVolume));
     }
+
+    this.updatePlayButton();
   }
 
   /**
@@ -545,10 +547,10 @@ class MusicPlayer {
     if (!playBtn) return;
 
     if (this.isPlaying) {
-      playBtn.innerHTML = '<i class="icon-pause">⏸️</i>';
+      playBtn.innerHTML = '<span class="player-icon">⏸️</span>';
       playBtn.setAttribute('aria-label', 'Pause');
     } else {
-      playBtn.innerHTML = '<i class="icon-play">▶️</i>';
+      playBtn.innerHTML = '<span class="player-icon">▶️</span>';
       playBtn.setAttribute('aria-label', 'Play');
     }
   }

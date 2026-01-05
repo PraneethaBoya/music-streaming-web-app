@@ -56,7 +56,7 @@ class UIManager {
           <img src="${coverSrc}" alt="${song?.title || ''}" class="song-card-image" onerror="this.onerror=null;this.src='${fallback}'">
           <div class="play-overlay">
             <button class="play-song-btn" data-song-id="${song.id}">
-              <i class="icon-play">▶️</i>
+              <span class="player-icon">▶️</span>
             </button>
           </div>
           <div class="song-card-like">
