@@ -161,6 +161,84 @@ const uploadSong = multer({
   }
 });
 
+app.post('/api/admin/reset-seed', async (req, res) => {
+  try {
+    if (!ensureDb(res)) return;
+
+    const secret = req.headers['x-admin-secret'];
+    if (!process.env.ADMIN_SECRET || String(secret || '') !== String(process.env.ADMIN_SECRET)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const demoAudioUrl = 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav';
+
+    const seedSongs = [
+      { title: 'Kesariya', artist: 'Arijit Singh', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh', audioUrl: demoAudioUrl },
+      { title: 'Tum Hi Ho', artist: 'Arijit Singh', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh', audioUrl: demoAudioUrl },
+
+      { title: 'Hukum', artist: 'Anirudh Ravichander', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh', audioUrl: demoAudioUrl },
+      { title: 'Why This Kolaveri Di', artist: 'Anirudh Ravichander', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh', audioUrl: demoAudioUrl },
+
+      { title: 'Jai Ho', artist: 'A. R. Rahman', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman', audioUrl: demoAudioUrl },
+      { title: 'Kun Faya Kun', artist: 'A. R. Rahman', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman', audioUrl: demoAudioUrl },
+
+      { title: 'Cruel Summer', artist: 'Taylor Swift', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift', audioUrl: demoAudioUrl },
+      { title: 'Blank Space', artist: 'Taylor Swift', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift', audioUrl: demoAudioUrl },
+
+      { title: 'Blinding Lights', artist: 'The Weeknd', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd', audioUrl: demoAudioUrl },
+      { title: 'Starboy', artist: 'The Weeknd', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd', audioUrl: demoAudioUrl },
+
+      { title: 'bad guy', artist: 'Billie Eilish', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish', audioUrl: demoAudioUrl },
+      { title: 'Happier Than Ever', artist: 'Billie Eilish', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish', audioUrl: demoAudioUrl }
+    ];
+
+    // Wipe in dependency order
+    await pool.query('DELETE FROM playlist_songs');
+    await pool.query('DELETE FROM playlists');
+    await pool.query('DELETE FROM songs');
+    await pool.query('DELETE FROM albums');
+    await pool.query('DELETE FROM artists');
+
+    const artistIdByName = new Map();
+    for (const item of seedSongs) {
+      const artistName = String(item.artist).trim();
+      if (artistIdByName.has(artistName)) continue;
+      const artistRes = await pool.query(
+        'INSERT INTO artists (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name',
+        [artistName]
+      );
+      artistIdByName.set(artistName, artistRes.rows[0].id);
+    }
+
+    const insertedSongs = [];
+    for (const item of seedSongs) {
+      const artistName = String(item.artist).trim();
+      const artistId = artistIdByName.get(artistName);
+      const songRes = await pool.query(
+        'INSERT INTO songs (title, artist_id, album_id, audio_url, cover_url, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, title, audio_url, cover_url',
+        [String(item.title).trim(), artistId, null, item.audioUrl, item.coverUrl]
+      );
+      insertedSongs.push({
+        id: songRes.rows[0].id,
+        title: songRes.rows[0].title,
+        artist: artistName,
+        audioUrl: songRes.rows[0].audio_url,
+        coverImage: songRes.rows[0].cover_url
+      });
+    }
+
+    res.json({
+      ok: true,
+      artists: artistIdByName.size,
+      songs: insertedSongs.length,
+      sample: insertedSongs.slice(0, 5)
+    });
+  } catch (error) {
+    console.error('Error resetting/seeding database:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/admin/delete-song', async (req, res) => {
   try {
     if (!ensureDb(res)) return;

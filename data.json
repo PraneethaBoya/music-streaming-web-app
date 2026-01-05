@@ -2,75 +2,198 @@
   "songs": [
     {
       "id": 1,
-      "title": "Blinding Lights",
-      "artist": "The Weeknd",
-      "album": "After Hours",
-      "duration": "3:20",
-      "cover": "https://via.placeholder.com/300x300/000000/00FF00?text=Blinding+Lights",
+      "title": "Kesariya",
+      "artist": "Arijit Singh",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 2,
-      "title": "Watermelon Sugar",
-      "artist": "Harry Styles",
-      "album": "Fine Line",
-      "duration": "2:54",
-      "cover": "https://via.placeholder.com/300x300/000000/FF00FF?text=Watermelon+Sugar",
+      "title": "Tum Hi Ho",
+      "artist": "Arijit Singh",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 3,
-      "title": "Levitating",
-      "artist": "Dua Lipa",
-      "album": "Future Nostalgia",
-      "duration": "3:23",
-      "cover": "https://via.placeholder.com/300x300/000000/00FFFF?text=Levitating",
+      "title": "Hukum",
+      "artist": "Anirudh Ravichander",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 4,
+      "title": "Why This Kolaveri Di",
+      "artist": "Anirudh Ravichander",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 5,
+      "title": "Jai Ho",
+      "artist": "A. R. Rahman",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 6,
+      "title": "Kun Faya Kun",
+      "artist": "A. R. Rahman",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 7,
+      "title": "Cruel Summer",
+      "artist": "Taylor Swift",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 8,
+      "title": "Blank Space",
+      "artist": "Taylor Swift",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 9,
+      "title": "Blinding Lights",
+      "artist": "The Weeknd",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 10,
+      "title": "Starboy",
+      "artist": "The Weeknd",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 11,
+      "title": "bad guy",
+      "artist": "Billie Eilish",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 12,
+      "title": "Happier Than Ever",
+      "artist": "Billie Eilish",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     }
   ],
   "artists": [
     {
       "id": 1,
-      "name": "The Weeknd",
-      "image": "https://via.placeholder.com/200x200/000000/00FF00?text=The+Weeknd",
+      "name": "Arijit Singh",
+      "image": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
       "followers": "85M"
     },
     {
       "id": 2,
-      "name": "Harry Styles",
-      "image": "https://via.placeholder.com/200x200/000000/FF00FF?text=Harry+Styles",
+      "name": "Anirudh Ravichander",
+      "image": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
       "followers": "60M"
     },
     {
       "id": 3,
-      "name": "Dua Lipa",
-      "image": "https://via.placeholder.com/200x200/000000/00FFFF?text=Dua+Lipa",
+      "name": "A. R. Rahman",
+      "image": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
       "followers": "55M"
+    },
+    {
+      "id": 4,
+      "name": "Taylor Swift",
+      "image": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "followers": "95M"
+    },
+    {
+      "id": 5,
+      "name": "The Weeknd",
+      "image": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "followers": "90M"
+    },
+    {
+      "id": 6,
+      "name": "Billie Eilish",
+      "image": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "followers": "75M"
     }
   ],
   "albums": [
     {
       "id": 1,
-      "title": "After Hours",
-      "artist": "The Weeknd",
-      "cover": "https://via.placeholder.com/300x300/000000/00FF00?text=After+Hours",
-      "year": 2020
+      "title": "Arijit Singh Essentials",
+      "artist": "Arijit Singh",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "year": 2024
     },
     {
       "id": 2,
-      "title": "Fine Line",
-      "artist": "Harry Styles",
-      "cover": "https://via.placeholder.com/300x300/000000/FF00FF?text=Fine+Line",
-      "year": 2019
+      "title": "Taylor Swift Essentials",
+      "artist": "Taylor Swift",
+      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "year": 2024
     }
   ],
   "playlists": [
     {
       "id": 1,
-      "title": "Top Hits 2023",
-      "description": "The biggest hits of the year",
-      "cover": "https://via.placeholder.com/300x300/000000/FFFFFF?text=Top+Hits",
-      "songs": [1, 2, 3]
+      "title": "Top Hits",
+      "description": "A clean starter playlist",
+      "cover": "https://via.placeholder.com/600x600/111111/FFFFFF?text=Top+Hits",
+      "songs": [1, 3, 5, 7, 9, 11]
     }
   ]
 }
