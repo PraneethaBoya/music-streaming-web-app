@@ -161,6 +161,20 @@ const uploadSong = multer({
   }
 });
 
+app.get('/api/admin/reset-seed', (req, res) => {
+  res.status(405).json({
+    error: 'Method Not Allowed',
+    message: 'Use POST to reset and seed the database.',
+    example: {
+      method: 'POST',
+      url: '/api/admin/reset-seed',
+      headers: {
+        'x-admin-secret': 'YOUR_ADMIN_SECRET'
+      }
+    }
+  });
+});
+
 app.post('/api/admin/reset-seed', async (req, res) => {
   try {
     if (!ensureDb(res)) return;
