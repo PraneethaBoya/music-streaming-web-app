@@ -686,7 +686,8 @@ img {
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
+  box-sizing: border-box;
 }
 
 .song-card:hover {
@@ -713,6 +714,7 @@ img {
   overflow: hidden;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-base);
+  background: #111;
 }
 
 .song-card:hover .song-card-image-wrapper {
@@ -1776,20 +1778,10 @@ img {
    opacity: 0;
    pointer-events: none;
    display: block;
-   background: rgba(255, 255, 255, 0.9);
+   background: rgba(0, 0, 0, 0.35);
    border-radius: 14px;
- }
-
- .sonic-wave-canvas {
-   position: relative;
-   width: min(70%, 280px);
-   height: 56px;
-   margin-top: 12px;
-   z-index: 3;
-   opacity: 0;
-   pointer-events: none;
-   background: rgba(255, 255, 255, 0.9);
-   border-radius: 14px;
+   border: 1px solid rgba(255, 255, 255, 0.14);
+   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
  }
 
  .now-playing-artist-photo {
@@ -1810,10 +1802,6 @@ img {
  }
 
  .sonic-waves.active {
-   opacity: 0.95;
- }
-
- .sonic-wave-canvas.active {
    opacity: 0.95;
  }
 

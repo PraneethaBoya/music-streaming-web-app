@@ -386,44 +386,53 @@ class AudioVisualizer {
     const intensity = Math.min(1, (this.energy * 1.1 + this.beat * 0.9)) * volumeBoost;
 
     const softAlpha = this.alpha;
-
     const glowBoost = 1 + (this.beat * 2.0);
 
+    // Smooth, modern waveform (time-domain driven)
+    const len = this.dataArray && this.dataArray.length ? this.dataArray.length : 0;
+    if (len === 0) return;
+
+    const amp = Math.max(2, (height * 0.22) + (height * 0.38) * intensity);
+    const step = 2;
+
     const gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, `rgba(0, 229, 255, ${0.95 * softAlpha})`);
-    gradient.addColorStop(0.45, `rgba(0, 255, 163, ${0.95 * softAlpha})`);
-    gradient.addColorStop(0.75, `rgba(255, 0, 122, ${0.95 * softAlpha})`);
-    gradient.addColorStop(1, `rgba(255, 176, 0, ${0.95 * softAlpha})`);
-
-    // Spotify-style barcode waveform (frequency-driven vertical bars)
-    const bins = this.freqArray && this.freqArray.length ? this.freqArray.length : 0;
-    if (bins === 0) return;
-
-    const barCount = Math.max(36, Math.min(84, Math.floor(width / 6)));
-    const gap = 2;
-    const barW = Math.max(2, Math.floor((width - (barCount - 1) * gap) / barCount));
-    const scroll = Math.floor(this.t * 2) % bins;
+    gradient.addColorStop(0, `rgba(26, 140, 255, ${0.95 * softAlpha})`);  // Neon Blue
+    gradient.addColorStop(0.5, `rgba(0, 229, 255, ${0.95 * softAlpha})`); // Cyan
+    gradient.addColorStop(1, `rgba(168, 85, 247, ${0.95 * softAlpha})`);  // Purple
 
     ctx.globalCompositeOperation = 'source-over';
     ctx.globalAlpha = 0.95 * softAlpha;
-    ctx.strokeStyle = gradient;
     ctx.lineCap = 'round';
-    ctx.shadowBlur = 10 * glowBoost;
-    ctx.shadowColor = `rgba(0, 229, 255, ${0.35 * softAlpha})`;
+    ctx.lineJoin = 'round';
 
-    for (let i = 0; i < barCount; i++) {
-      const binIndex = (scroll + Math.floor((i / barCount) * bins)) % bins;
-      const v = this.freqArray[binIndex] / 255;
-      const energyBoost = 0.65 + this.energy * 0.75;
-      const h = Math.max(3, (height * 0.78) * (0.12 + v * 0.95) * energyBoost);
-      const x = i * (barW + gap) + barW / 2;
-
-      ctx.lineWidth = barW;
-      ctx.beginPath();
-      ctx.moveTo(x, centerY - h * 0.5);
-      ctx.lineTo(x, centerY + h * 0.5);
-      ctx.stroke();
+    // Outer glow stroke
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = 5;
+    ctx.shadowBlur = 26 * glowBoost;
+    ctx.shadowColor = `rgba(0, 229, 255, ${0.45 * softAlpha})`;
+    ctx.beginPath();
+    for (let x = 0; x <= width; x += step) {
+      const idx = Math.floor((x / width) * (len - 1));
+      const v = (this.dataArray[idx] - 128) / 128;
+      const y = centerY + v * amp;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
     }
+    ctx.stroke();
+
+    // Crisp inner stroke for definition
+    ctx.shadowBlur = 10 * glowBoost;
+    ctx.shadowColor = `rgba(168, 85, 247, ${0.35 * softAlpha})`;
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    for (let x = 0; x <= width; x += step) {
+      const idx = Math.floor((x / width) * (len - 1));
+      const v = (this.dataArray[idx] - 128) / 128;
+      const y = centerY + v * amp;
+      if (x === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
 
     ctx.globalAlpha = 1;
     ctx.shadowBlur = 0;
