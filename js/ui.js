@@ -167,7 +167,7 @@ class UIManager {
     if (!container) return;
 
     if (artists.length === 0) {
-      container.innerHTML = '<p class="loading">No artists found</p>';
+      container.innerHTML = '<p class="loading">No artists available</p>';
       return;
     }
 
@@ -295,34 +295,71 @@ class UIManager {
    * Initialize player controls
    */
   initPlayerControls() {
+    const hasSongs = (this.dataManager.getSongs() || []).length > 0;
+
     // Play/Pause button
     const playBtn = document.getElementById('play-btn');
     if (playBtn) {
-      playBtn.addEventListener('click', () => this.player.togglePlay());
+      if (!hasSongs) {
+        playBtn.disabled = true;
+        playBtn.style.pointerEvents = 'none';
+      }
+      playBtn.addEventListener('click', () => {
+        if (!hasSongs) return;
+        this.player.togglePlay();
+      });
     }
 
     // Previous button
     const prevBtn = document.getElementById('prev-btn');
     if (prevBtn) {
-      prevBtn.addEventListener('click', () => this.player.previous());
+      if (!hasSongs) {
+        prevBtn.disabled = true;
+        prevBtn.style.pointerEvents = 'none';
+      }
+      prevBtn.addEventListener('click', () => {
+        if (!hasSongs) return;
+        this.player.previous();
+      });
     }
 
     // Next button
     const nextBtn = document.getElementById('next-btn');
     if (nextBtn) {
-      nextBtn.addEventListener('click', () => this.player.next());
+      if (!hasSongs) {
+        nextBtn.disabled = true;
+        nextBtn.style.pointerEvents = 'none';
+      }
+      nextBtn.addEventListener('click', () => {
+        if (!hasSongs) return;
+        this.player.next();
+      });
     }
 
     // Shuffle button
     const shuffleBtn = document.getElementById('shuffle-btn');
     if (shuffleBtn) {
-      shuffleBtn.addEventListener('click', () => this.player.toggleShuffle());
+      if (!hasSongs) {
+        shuffleBtn.disabled = true;
+        shuffleBtn.style.pointerEvents = 'none';
+      }
+      shuffleBtn.addEventListener('click', () => {
+        if (!hasSongs) return;
+        this.player.toggleShuffle();
+      });
     }
 
     // Repeat button
     const repeatBtn = document.getElementById('repeat-btn');
     if (repeatBtn) {
-      repeatBtn.addEventListener('click', () => this.player.toggleRepeat());
+      if (!hasSongs) {
+        repeatBtn.disabled = true;
+        repeatBtn.style.pointerEvents = 'none';
+      }
+      repeatBtn.addEventListener('click', () => {
+        if (!hasSongs) return;
+        this.player.toggleRepeat();
+      });
     }
 
     // Progress bar

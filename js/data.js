@@ -78,6 +78,48 @@ class DataManager {
     };
   }
 
+  buildLegacySongFromCatalog(artist, album, song) {
+    const songId = song?.songId != null ? String(song.songId) : '';
+    const title = song?.title != null ? String(song.title) : '';
+    const artistName = artist?.artistName != null ? String(artist.artistName) : '';
+    const albumName = album?.albumName != null ? String(album.albumName) : '';
+    const cover = album?.albumCover != null ? String(album.albumCover) : '';
+    const audio = song?.audioUrl != null ? String(song.audioUrl) : '';
+    const duration = song?.duration != null ? String(song.duration) : '';
+
+    return {
+      id: songId,
+      title,
+      artist: artistName,
+      album: albumName,
+      duration,
+      cover,
+      audio,
+      coverImage: cover,
+      audioUrl: audio,
+      language: ''
+    };
+  }
+
+  getCatalog() {
+    return Array.isArray(this.data?.catalog) ? this.data.catalog : [];
+  }
+
+  getAllSongsFromCatalog() {
+    const catalog = this.getCatalog();
+    const songs = [];
+    for (const artist of catalog) {
+      const albums = Array.isArray(artist?.albums) ? artist.albums : [];
+      for (const album of albums) {
+        const albumSongs = Array.isArray(album?.songs) ? album.songs : [];
+        for (const song of albumSongs) {
+          songs.push(this.buildLegacySongFromCatalog(artist, album, song));
+        }
+      }
+    }
+    return songs;
+  }
+
   /**
    * Load music data from JSON file
    */
@@ -91,80 +133,23 @@ class DataManager {
         ? window.API_BASE_URL
         : `${window.location.origin}/api`;
 
-      const apiRes = await fetch(`${apiBaseUrl}/songs`).catch(() => null);
+      const apiRes = await fetch(`${apiBaseUrl}/catalog`).catch(() => null);
       if (apiRes && apiRes.ok) {
-        const songs = await apiRes.json();
-        const normalized = Array.isArray(songs) ? songs.map(s => this.normalizeSong(s)) : [];
-        const removedSongIds = new Set();
-        const seen = new Set();
-        const uniqueSongs = [];
-
-        for (const song of normalized) {
-          if (this.isBlockedSong(song)) {
-            if (song?.id != null) removedSongIds.add(String(song.id));
-            continue;
-          }
-          const key = this.buildDedupeKey(song);
-          if (seen.has(key)) {
-            if (song?.id != null) removedSongIds.add(String(song.id));
-            continue;
-          }
-          seen.add(key);
-          uniqueSongs.push(song);
-        }
-
+        const catalog = await apiRes.json();
         this.data = {
-          songs: uniqueSongs,
-          artists: [],
-          albums: [],
+          catalog: Array.isArray(catalog) ? catalog : [],
           playlists: []
         };
-
-        if (removedSongIds.size > 0) {
-          this.cleanClientCaches(removedSongIds);
-        }
-
         this.loaded = true;
         return this.data;
       }
 
       const response = await fetch('./data.json');
       const local = await response.json();
-      const normalizedSongs = Array.isArray(local?.songs) ? local.songs.map(s => this.normalizeSong(s)) : [];
-      const removedSongIds = new Set();
-      const seen = new Set();
-      const uniqueSongs = [];
-
-      for (const song of normalizedSongs) {
-        if (this.isBlockedSong(song)) {
-          if (song?.id != null) removedSongIds.add(String(song.id));
-          continue;
-        }
-        const key = this.buildDedupeKey(song);
-        if (seen.has(key)) {
-          if (song?.id != null) removedSongIds.add(String(song.id));
-          continue;
-        }
-        seen.add(key);
-        uniqueSongs.push(song);
-      }
-
-      const songIdSet = new Set(uniqueSongs.map(s => String(s.id)));
-      const playlists = Array.isArray(local?.playlists) ? local.playlists.map(p => {
-        const songs = Array.isArray(p?.songs) ? p.songs.map(id => String(id)).filter(id => songIdSet.has(id)) : [];
-        return { ...p, songs };
-      }) : [];
-
       this.data = {
-        songs: uniqueSongs,
-        artists: Array.isArray(local?.artists) ? local.artists : [],
-        albums: Array.isArray(local?.albums) ? local.albums : [],
-        playlists
+        catalog: Array.isArray(local?.catalog) ? local.catalog : [],
+        playlists: Array.isArray(local?.playlists) ? local.playlists : []
       };
-
-      if (removedSongIds.size > 0) {
-        this.cleanClientCaches(removedSongIds);
-      }
       this.loaded = true;
       return this.data;
     } catch (error) {
@@ -177,7 +162,7 @@ class DataManager {
    * Get all songs
    */
   getSongs() {
-    return this.data?.songs || [];
+    return this.getAllSongsFromCatalog();
   }
 
   /**
@@ -185,7 +170,18 @@ class DataManager {
    */
   getSongById(id) {
     const key = id != null ? String(id) : '';
-    return this.data?.songs.find(song => String(song.id) === key);
+    const catalog = this.getCatalog();
+    for (const artist of catalog) {
+      const albums = Array.isArray(artist?.albums) ? artist.albums : [];
+      for (const album of albums) {
+        const songs = Array.isArray(album?.songs) ? album.songs : [];
+        for (const s of songs) {
+          const songId = s?.songId != null ? String(s.songId) : '';
+          if (songId === key) return this.buildLegacySongFromCatalog(artist, album, s);
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -199,28 +195,61 @@ class DataManager {
    * Get all artists
    */
   getArtists() {
-    return this.data?.artists || [];
+    const catalog = this.getCatalog();
+    return catalog.map(a => ({
+      id: a.artistId,
+      name: a.artistName,
+      image: a.artistImage || '',
+      followers: '0'
+    }));
   }
 
   /**
    * Get artist by ID
    */
   getArtistById(id) {
-    return this.data?.artists.find(artist => artist.id === id);
+    const key = id != null ? Number(id) : null;
+    const catalog = this.getCatalog();
+    const found = catalog.find(a => Number(a.artistId) === key);
+    if (!found) return null;
+    return {
+      id: found.artistId,
+      name: found.artistName,
+      image: found.artistImage || '',
+      followers: '0'
+    };
   }
 
   /**
    * Get all albums
    */
   getAlbums() {
-    return this.data?.albums || [];
+    const catalog = this.getCatalog();
+    const albums = [];
+    for (const artist of catalog) {
+      const aName = artist?.artistName != null ? String(artist.artistName) : '';
+      const aId = artist?.artistId;
+      const list = Array.isArray(artist?.albums) ? artist.albums : [];
+      for (const album of list) {
+        albums.push({
+          id: album.albumId,
+          title: album.albumName,
+          artist: aName,
+          artistId: aId,
+          cover: album.albumCover || ''
+        });
+      }
+    }
+    return albums;
   }
 
   /**
    * Get album by ID
    */
   getAlbumById(id) {
-    return this.data?.albums.find(album => album.id === id);
+    const key = id != null ? Number(id) : null;
+    const albums = this.getAlbums();
+    return albums.find(a => Number(a.id) === key);
   }
 
   /**
@@ -269,19 +298,19 @@ class DataManager {
 
     const lowerQuery = query.toLowerCase();
     
-    const songs = this.data.songs.filter(song => 
+    const songs = this.getSongs().filter(song =>
       song.title.toLowerCase().includes(lowerQuery) ||
       song.artist.toLowerCase().includes(lowerQuery) ||
       song.album.toLowerCase().includes(lowerQuery)
     );
 
-    const artists = this.data.artists.filter(artist =>
-      artist.name.toLowerCase().includes(lowerQuery)
+    const artists = this.getArtists().filter(artist =>
+      String(artist.name || '').toLowerCase().includes(lowerQuery)
     );
 
-    const albums = this.data.albums.filter(album =>
-      album.title.toLowerCase().includes(lowerQuery) ||
-      album.artist.toLowerCase().includes(lowerQuery)
+    const albums = this.getAlbums().filter(album =>
+      String(album.title || '').toLowerCase().includes(lowerQuery) ||
+      String(album.artist || '').toLowerCase().includes(lowerQuery)
     );
 
     return { songs, artists, albums };

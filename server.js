@@ -184,78 +184,17 @@ app.post('/api/admin/reset-seed', async (req, res) => {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const demoAudioUrl = 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav';
-
-    const seedSongs = [
-      // Telugu-majority
-      { title: 'Butta Bomma', artist: 'Sid Sriram', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram', audioUrl: demoAudioUrl },
-      { title: 'Srivalli', artist: 'Sid Sriram', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram', audioUrl: demoAudioUrl },
-      { title: 'Inkem Inkem Inkem Kaavaale', artist: 'Sid Sriram', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram', audioUrl: demoAudioUrl },
-
-      { title: 'Ringa Ringa', artist: 'Devi Sri Prasad (DSP)', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP', audioUrl: demoAudioUrl },
-      { title: 'Seeti Maar', artist: 'Devi Sri Prasad (DSP)', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP', audioUrl: demoAudioUrl },
-      { title: 'Daddy Mummy', artist: 'Devi Sri Prasad (DSP)', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP', audioUrl: demoAudioUrl },
-
-      { title: 'Samajavaragamana', artist: 'S. S. Thaman', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman', audioUrl: demoAudioUrl },
-      { title: 'Ala Vaikunthapurramuloo', artist: 'S. S. Thaman', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman', audioUrl: demoAudioUrl },
-      { title: 'Kalaavathi', artist: 'S. S. Thaman', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman', audioUrl: demoAudioUrl },
-
-      // Tamil
-      { title: 'Hukum', artist: 'Anirudh Ravichander', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh', audioUrl: demoAudioUrl },
-      { title: 'Why This Kolaveri Di', artist: 'Anirudh Ravichander', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh', audioUrl: demoAudioUrl },
-
-      { title: 'Jai Ho', artist: 'A. R. Rahman', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman', audioUrl: demoAudioUrl },
-      { title: 'Kun Faya Kun', artist: 'A. R. Rahman', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman', audioUrl: demoAudioUrl },
-
-      // Hindi
-      { title: 'Kesariya', artist: 'Arijit Singh', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh', audioUrl: demoAudioUrl },
-      { title: 'Tum Hi Ho', artist: 'Arijit Singh', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh', audioUrl: demoAudioUrl },
-
-      { title: 'Sun Raha Hai', artist: 'Shreya Ghoshal', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya', audioUrl: demoAudioUrl },
-      { title: 'Teri Ore', artist: 'Shreya Ghoshal', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya', audioUrl: demoAudioUrl }
-    ];
-
     // Wipe in dependency order
     await pool.query('DELETE FROM playlist_songs');
     await pool.query('DELETE FROM playlists');
     await pool.query('DELETE FROM songs');
     await pool.query('DELETE FROM albums');
     await pool.query('DELETE FROM artists');
-
-    const artistIdByName = new Map();
-    for (const item of seedSongs) {
-      const artistName = String(item.artist).trim();
-      if (artistIdByName.has(artistName)) continue;
-      const artistRes = await pool.query(
-        'INSERT INTO artists (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name',
-        [artistName]
-      );
-      artistIdByName.set(artistName, artistRes.rows[0].id);
-    }
-
-    const insertedSongs = [];
-    for (const item of seedSongs) {
-      const artistName = String(item.artist).trim();
-      const artistId = artistIdByName.get(artistName);
-      const songRes = await pool.query(
-        'INSERT INTO songs (title, artist_id, album_id, audio_url, cover_url, genre, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, title, audio_url, cover_url, genre',
-        [String(item.title).trim(), artistId, null, item.audioUrl, item.coverUrl, item.language]
-      );
-      insertedSongs.push({
-        id: songRes.rows[0].id,
-        title: songRes.rows[0].title,
-        artist: artistName,
-        language: songRes.rows[0].genre,
-        audioUrl: songRes.rows[0].audio_url,
-        coverImage: songRes.rows[0].cover_url
-      });
-    }
-
     res.json({
       ok: true,
-      artists: artistIdByName.size,
-      songs: insertedSongs.length,
-      sample: insertedSongs.slice(0, 5)
+      artists: 0,
+      albums: 0,
+      songs: 0
     });
   } catch (error) {
     console.error('Error resetting/seeding database:', error);
@@ -397,7 +336,7 @@ app.post('/api/upload/song', (req, res) => {
 
     try {
       const artistName = String(artist).trim();
-      const albumTitle = album ? String(album).trim() : '';
+      const albumTitle = (album ? String(album).trim() : '') || 'Singles';
 
       const artistResult = await pool.query(
         'INSERT INTO artists (name) VALUES ($1) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name',
@@ -406,20 +345,18 @@ app.post('/api/upload/song', (req, res) => {
       const artistRow = artistResult.rows[0];
 
       let albumId = null;
-      if (albumTitle) {
-        const existingAlbum = await pool.query(
-          'SELECT id, title FROM albums WHERE title = $1 AND artist_id = $2 LIMIT 1',
+      const existingAlbum = await pool.query(
+        'SELECT id, title FROM albums WHERE title = $1 AND artist_id = $2 LIMIT 1',
+        [albumTitle, artistRow.id]
+      );
+      if (existingAlbum.rows.length > 0) {
+        albumId = existingAlbum.rows[0].id;
+      } else {
+        const createdAlbum = await pool.query(
+          'INSERT INTO albums (title, artist_id) VALUES ($1, $2) RETURNING id, title',
           [albumTitle, artistRow.id]
         );
-        if (existingAlbum.rows.length > 0) {
-          albumId = existingAlbum.rows[0].id;
-        } else {
-          const createdAlbum = await pool.query(
-            'INSERT INTO albums (title, artist_id) VALUES ($1, $2) RETURNING id, title',
-            [albumTitle, artistRow.id]
-          );
-          albumId = createdAlbum.rows[0].id;
-        }
+        albumId = createdAlbum.rows[0].id;
       }
 
       const songResult = await pool.query(
@@ -566,6 +503,105 @@ app.post('/api/auth/login', async (req, res) => {
 // ============================================
 // Songs Routes
 // ============================================
+
+// Artist → Album → Song catalog
+app.get('/api/catalog', async (req, res) => {
+  try {
+    if (!pool) {
+      const local = getLocalData();
+      res.json(Array.isArray(local?.catalog) ? local.catalog : []);
+      return;
+    }
+
+    const result = await pool.query(
+      `SELECT
+        a.id AS artist_id,
+        a.name AS artist_name,
+        a.image_url AS artist_image,
+        al.id AS album_id,
+        al.title AS album_name,
+        al.cover_url AS album_cover,
+        s.id AS song_id,
+        s.title AS song_title,
+        s.duration AS song_duration,
+        s.audio_url AS audio_url,
+        s.created_at AS song_created_at
+      FROM artists a
+      LEFT JOIN albums al ON al.artist_id = a.id
+      LEFT JOIN songs s ON s.album_id = al.id
+      ORDER BY a.created_at ASC, al.created_at ASC, s.created_at ASC`
+    );
+
+    const artistOrder = [];
+    const artistMap = new Map();
+    const albumMapByArtist = new Map();
+    const artistNumericIdByUuid = new Map();
+    const albumNumericIdByUuid = new Map();
+    const songNumericIdByUuid = new Map();
+
+    const getArtistNumericId = (uuid) => {
+      if (!uuid) return null;
+      if (!artistNumericIdByUuid.has(uuid)) artistNumericIdByUuid.set(uuid, artistNumericIdByUuid.size + 1);
+      return artistNumericIdByUuid.get(uuid);
+    };
+    const getAlbumNumericId = (uuid) => {
+      if (!uuid) return null;
+      if (!albumNumericIdByUuid.has(uuid)) albumNumericIdByUuid.set(uuid, albumNumericIdByUuid.size + 1);
+      return albumNumericIdByUuid.get(uuid);
+    };
+    const getSongNumericId = (uuid) => {
+      if (!uuid) return null;
+      if (!songNumericIdByUuid.has(uuid)) songNumericIdByUuid.set(uuid, songNumericIdByUuid.size + 1);
+      return songNumericIdByUuid.get(uuid);
+    };
+
+    for (const row of result.rows) {
+      const artistUuid = row.artist_id;
+      if (!artistMap.has(artistUuid)) {
+        artistMap.set(artistUuid, {
+          artistId: getArtistNumericId(artistUuid),
+          artistName: row.artist_name || '',
+          artistImage: row.artist_image || '',
+          albums: []
+        });
+        artistOrder.push(artistUuid);
+        albumMapByArtist.set(artistUuid, new Map());
+      }
+
+      const artistAlbumsMap = albumMapByArtist.get(artistUuid);
+      const albumUuid = row.album_id;
+      if (albumUuid && !artistAlbumsMap.has(albumUuid)) {
+        const albumObj = {
+          albumId: getAlbumNumericId(albumUuid),
+          albumName: row.album_name || '',
+          albumCover: row.album_cover || '',
+          songs: []
+        };
+        artistAlbumsMap.set(albumUuid, albumObj);
+        artistMap.get(artistUuid).albums.push(albumObj);
+      }
+
+      if (albumUuid && row.song_id) {
+        const albumObj = artistAlbumsMap.get(albumUuid);
+        if (albumObj) {
+          albumObj.songs.push({
+            songId: getSongNumericId(row.song_id),
+            title: row.song_title || '',
+            duration: row.song_duration != null ? String(row.song_duration) : '',
+            audioUrl: row.audio_url || '',
+            liked: false
+          });
+        }
+      }
+    }
+
+    const catalog = artistOrder.map(uuid => artistMap.get(uuid)).filter(Boolean);
+    res.json(catalog);
+  } catch (error) {
+    console.error('Error fetching catalog:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Get all songs
 app.get('/api/songs', async (req, res) => {

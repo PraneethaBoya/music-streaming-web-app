@@ -51,6 +51,19 @@ class AudioVisualizer {
     }
   }
 
+  getPreferredCanvasElement() {
+    const overlayCanvas = document.getElementById('now-playing-visualizer');
+    if (overlayCanvas) return overlayCanvas;
+    return document.getElementById('audio-visualizer');
+  }
+
+  setCanvasElement(canvas) {
+    if (!canvas || this.canvas === canvas) return;
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.resizeCanvas();
+  }
+
   /**
    * Initialize visualizer
    */
@@ -63,8 +76,8 @@ class AudioVisualizer {
    * Create canvas element
    */
   createCanvas() {
-    // Check if canvas already exists
-    let canvas = document.getElementById('audio-visualizer');
+    // Prefer the overlay canvas if present, otherwise use the fixed canvas
+    let canvas = this.getPreferredCanvasElement();
     
     if (!canvas) {
       canvas = document.createElement('canvas');
@@ -222,6 +235,10 @@ class AudioVisualizer {
    */
   start() {
     if (this.isPlaying) return;
+
+    // If the Now Playing overlay exists, draw there so it stays visible above the cover.
+    const preferredCanvas = this.getPreferredCanvasElement();
+    if (preferredCanvas) this.setCanvasElement(preferredCanvas);
     
     this.isPlaying = true;
     this.targetAlpha = 1;

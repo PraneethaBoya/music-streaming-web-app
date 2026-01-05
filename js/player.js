@@ -326,6 +326,8 @@ class MusicPlayer {
    * Play audio
    */
   play() {
+    if (!this.currentSong) return;
+    if (!this.audio || !String(this.audio.src || '').trim()) return;
     this.audio.play()
       .then(() => {
         this.isPlaying = true;
@@ -356,6 +358,8 @@ class MusicPlayer {
    * Toggle play/pause
    */
   togglePlay() {
+    if (!this.currentSong) return;
+    if (!this.audio || !String(this.audio.src || '').trim()) return;
     if (this.isPlaying) {
       this.pause();
     } else {
