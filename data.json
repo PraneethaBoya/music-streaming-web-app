@@ -2,198 +2,276 @@
   "songs": [
     {
       "id": 1,
-      "title": "Kesariya",
-      "artist": "Arijit Singh",
+      "title": "Butta Bomma",
+      "artist": "Sid Sriram",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 2,
-      "title": "Tum Hi Ho",
-      "artist": "Arijit Singh",
+      "title": "Srivalli",
+      "artist": "Sid Sriram",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 3,
-      "title": "Hukum",
-      "artist": "Anirudh Ravichander",
+      "title": "Inkem Inkem Inkem Kaavaale",
+      "artist": "Sid Sriram",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 4,
-      "title": "Why This Kolaveri Di",
-      "artist": "Anirudh Ravichander",
+      "title": "Ringa Ringa",
+      "artist": "Devi Sri Prasad (DSP)",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
+      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 5,
-      "title": "Jai Ho",
-      "artist": "A. R. Rahman",
+      "title": "Seeti Maar",
+      "artist": "Devi Sri Prasad (DSP)",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 6,
-      "title": "Kun Faya Kun",
-      "artist": "A. R. Rahman",
+      "title": "Daddy Mummy",
+      "artist": "Devi Sri Prasad (DSP)",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "coverImage": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "cover": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 7,
-      "title": "Cruel Summer",
-      "artist": "Taylor Swift",
+      "title": "Samajavaragamana",
+      "artist": "S. S. Thaman",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 8,
-      "title": "Blank Space",
-      "artist": "Taylor Swift",
+      "title": "Ala Vaikunthapurramuloo",
+      "artist": "S. S. Thaman",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 9,
-      "title": "Blinding Lights",
-      "artist": "The Weeknd",
+      "title": "Kalaavathi",
+      "artist": "S. S. Thaman",
+      "language": "Telugu",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "coverImage": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 10,
-      "title": "Starboy",
-      "artist": "The Weeknd",
+      "title": "Hukum",
+      "artist": "Anirudh Ravichander",
+      "language": "Tamil",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "coverImage": "https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
+      "cover": "https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 11,
-      "title": "bad guy",
-      "artist": "Billie Eilish",
+      "title": "Why This Kolaveri Di",
+      "artist": "Anirudh Ravichander",
+      "language": "Tamil",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "coverImage": "https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "cover": "https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     },
     {
       "id": 12,
-      "title": "Happier Than Ever",
-      "artist": "Billie Eilish",
+      "title": "Jai Ho",
+      "artist": "A. R. Rahman",
+      "language": "Tamil",
       "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
-      "coverImage": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman",
       "album": "Demo",
       "duration": "3:00",
-      "cover": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
+      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 13,
+      "title": "Kun Faya Kun",
+      "artist": "A. R. Rahman",
+      "language": "Tamil",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 14,
+      "title": "Kesariya",
+      "artist": "Arijit Singh",
+      "language": "Hindi",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 15,
+      "title": "Tum Hi Ho",
+      "artist": "Arijit Singh",
+      "language": "Hindi",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 16,
+      "title": "Sun Raha Hai",
+      "artist": "Shreya Ghoshal",
+      "language": "Hindi",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya",
+      "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
+    },
+    {
+      "id": 17,
+      "title": "Teri Ore",
+      "artist": "Shreya Ghoshal",
+      "language": "Hindi",
+      "audioUrl": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav",
+      "coverImage": "https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya",
+      "album": "Demo",
+      "duration": "3:00",
+      "cover": "https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya",
       "audio": "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav"
     }
   ],
   "artists": [
     {
       "id": 1,
-      "name": "Arijit Singh",
-      "image": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
-      "followers": "85M"
-    },
-    {
-      "id": 2,
-      "name": "Anirudh Ravichander",
-      "image": "https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh",
-      "followers": "60M"
-    },
-    {
-      "id": 3,
-      "name": "A. R. Rahman",
-      "image": "https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman",
+      "name": "Sid Sriram",
+      "image": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram",
       "followers": "55M"
     },
     {
+      "id": 2,
+      "name": "Devi Sri Prasad (DSP)",
+      "image": "https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP",
+      "followers": "45M"
+    },
+    {
+      "id": 3,
+      "name": "S. S. Thaman",
+      "image": "https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman",
+      "followers": "35M"
+    },
+    {
       "id": 4,
-      "name": "Taylor Swift",
-      "image": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
-      "followers": "95M"
+      "name": "Anirudh Ravichander",
+      "image": "https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh",
+      "followers": "60M"
     },
     {
       "id": 5,
-      "name": "The Weeknd",
-      "image": "https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd",
-      "followers": "90M"
+      "name": "A. R. Rahman",
+      "image": "https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman",
+      "followers": "70M"
     },
     {
       "id": 6,
-      "name": "Billie Eilish",
-      "image": "https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish",
-      "followers": "75M"
+      "name": "Arijit Singh",
+      "image": "https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh",
+      "followers": "85M"
+    },
+    {
+      "id": 7,
+      "name": "Shreya Ghoshal",
+      "image": "https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya",
+      "followers": "50M"
     }
   ],
   "albums": [
     {
       "id": 1,
-      "title": "Arijit Singh Essentials",
-      "artist": "Arijit Singh",
-      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh",
+      "title": "Telugu Essentials",
+      "artist": "Various Artists",
+      "cover": "https://via.placeholder.com/600x600/111111/FF2D8D?text=Telugu+Hits",
       "year": 2024
     },
     {
       "id": 2,
-      "title": "Taylor Swift Essentials",
-      "artist": "Taylor Swift",
-      "cover": "https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift",
+      "title": "Indian Mix",
+      "artist": "Various Artists",
+      "cover": "https://via.placeholder.com/600x600/111111/00C2FF?text=Indian+Mix",
       "year": 2024
     }
   ],
   "playlists": [
     {
       "id": 1,
-      "title": "Top Hits",
-      "description": "A clean starter playlist",
-      "cover": "https://via.placeholder.com/600x600/111111/FFFFFF?text=Top+Hits",
-      "songs": [1, 3, 5, 7, 9, 11]
+      "title": "Telugu Top Picks",
+      "description": "Telugu-first starter playlist",
+      "cover": "https://via.placeholder.com/600x600/111111/FFFFFF?text=Telugu+Top+Picks",
+      "songs": [1, 2, 3, 4, 5, 6, 7, 8, 9]
     }
   ]
 }

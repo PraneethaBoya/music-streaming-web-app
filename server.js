@@ -173,23 +173,32 @@ app.post('/api/admin/reset-seed', async (req, res) => {
     const demoAudioUrl = 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav';
 
     const seedSongs = [
-      { title: 'Kesariya', artist: 'Arijit Singh', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh', audioUrl: demoAudioUrl },
-      { title: 'Tum Hi Ho', artist: 'Arijit Singh', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Arijit+Singh', audioUrl: demoAudioUrl },
+      // Telugu-majority
+      { title: 'Butta Bomma', artist: 'Sid Sriram', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram', audioUrl: demoAudioUrl },
+      { title: 'Srivalli', artist: 'Sid Sriram', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram', audioUrl: demoAudioUrl },
+      { title: 'Inkem Inkem Inkem Kaavaale', artist: 'Sid Sriram', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/FF2D8D?text=Sid+Sriram', audioUrl: demoAudioUrl },
 
-      { title: 'Hukum', artist: 'Anirudh Ravichander', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh', audioUrl: demoAudioUrl },
-      { title: 'Why This Kolaveri Di', artist: 'Anirudh Ravichander', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=Anirudh', audioUrl: demoAudioUrl },
+      { title: 'Ringa Ringa', artist: 'Devi Sri Prasad (DSP)', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP', audioUrl: demoAudioUrl },
+      { title: 'Seeti Maar', artist: 'Devi Sri Prasad (DSP)', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP', audioUrl: demoAudioUrl },
+      { title: 'Daddy Mummy', artist: 'Devi Sri Prasad (DSP)', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/8E2DE2?text=DSP', audioUrl: demoAudioUrl },
 
-      { title: 'Jai Ho', artist: 'A. R. Rahman', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman', audioUrl: demoAudioUrl },
-      { title: 'Kun Faya Kun', artist: 'A. R. Rahman', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=A.R.+Rahman', audioUrl: demoAudioUrl },
+      { title: 'Samajavaragamana', artist: 'S. S. Thaman', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman', audioUrl: demoAudioUrl },
+      { title: 'Ala Vaikunthapurramuloo', artist: 'S. S. Thaman', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman', audioUrl: demoAudioUrl },
+      { title: 'Kalaavathi', artist: 'S. S. Thaman', language: 'Telugu', coverUrl: 'https://via.placeholder.com/600x600/111111/00C2FF?text=Thaman', audioUrl: demoAudioUrl },
 
-      { title: 'Cruel Summer', artist: 'Taylor Swift', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift', audioUrl: demoAudioUrl },
-      { title: 'Blank Space', artist: 'Taylor Swift', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=Taylor+Swift', audioUrl: demoAudioUrl },
+      // Tamil
+      { title: 'Hukum', artist: 'Anirudh Ravichander', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh', audioUrl: demoAudioUrl },
+      { title: 'Why This Kolaveri Di', artist: 'Anirudh Ravichander', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=Anirudh', audioUrl: demoAudioUrl },
 
-      { title: 'Blinding Lights', artist: 'The Weeknd', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd', audioUrl: demoAudioUrl },
-      { title: 'Starboy', artist: 'The Weeknd', coverUrl: 'https://via.placeholder.com/600x600/111111/06D6A0?text=The+Weeknd', audioUrl: demoAudioUrl },
+      { title: 'Jai Ho', artist: 'A. R. Rahman', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman', audioUrl: demoAudioUrl },
+      { title: 'Kun Faya Kun', artist: 'A. R. Rahman', language: 'Tamil', coverUrl: 'https://via.placeholder.com/600x600/111111/FFD166?text=A.R.+Rahman', audioUrl: demoAudioUrl },
 
-      { title: 'bad guy', artist: 'Billie Eilish', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish', audioUrl: demoAudioUrl },
-      { title: 'Happier Than Ever', artist: 'Billie Eilish', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Billie+Eilish', audioUrl: demoAudioUrl }
+      // Hindi
+      { title: 'Kesariya', artist: 'Arijit Singh', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh', audioUrl: demoAudioUrl },
+      { title: 'Tum Hi Ho', artist: 'Arijit Singh', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/EF476F?text=Arijit+Singh', audioUrl: demoAudioUrl },
+
+      { title: 'Sun Raha Hai', artist: 'Shreya Ghoshal', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya', audioUrl: demoAudioUrl },
+      { title: 'Teri Ore', artist: 'Shreya Ghoshal', language: 'Hindi', coverUrl: 'https://via.placeholder.com/600x600/111111/9B5DE5?text=Shreya', audioUrl: demoAudioUrl }
     ];
 
     // Wipe in dependency order
@@ -215,13 +224,14 @@ app.post('/api/admin/reset-seed', async (req, res) => {
       const artistName = String(item.artist).trim();
       const artistId = artistIdByName.get(artistName);
       const songRes = await pool.query(
-        'INSERT INTO songs (title, artist_id, album_id, audio_url, cover_url, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, title, audio_url, cover_url',
-        [String(item.title).trim(), artistId, null, item.audioUrl, item.coverUrl]
+        'INSERT INTO songs (title, artist_id, album_id, audio_url, cover_url, genre, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW()) RETURNING id, title, audio_url, cover_url, genre',
+        [String(item.title).trim(), artistId, null, item.audioUrl, item.coverUrl, item.language]
       );
       insertedSongs.push({
         id: songRes.rows[0].id,
         title: songRes.rows[0].title,
         artist: artistName,
+        language: songRes.rows[0].genre,
         audioUrl: songRes.rows[0].audio_url,
         coverImage: songRes.rows[0].cover_url
       });
@@ -559,8 +569,11 @@ app.get('/api/songs', async (req, res) => {
         a.name AS artist,
         al.title AS album,
         s.duration,
+        s.genre AS language,
         s.cover_url AS cover,
-        s.audio_url AS audio
+        s.audio_url AS audio,
+        s.cover_url AS coverImage,
+        s.audio_url AS audioUrl
       FROM songs s
       LEFT JOIN artists a ON a.id = s.artist_id
       LEFT JOIN albums al ON al.id = s.album_id
@@ -593,8 +606,11 @@ app.get('/api/songs/:id', async (req, res) => {
         a.name AS artist,
         al.title AS album,
         s.duration,
+        s.genre AS language,
         s.cover_url AS cover,
-        s.audio_url AS audio
+        s.audio_url AS audio,
+        s.cover_url AS coverImage,
+        s.audio_url AS audioUrl
       FROM songs s
       LEFT JOIN artists a ON a.id = s.artist_id
       LEFT JOIN albums al ON al.id = s.album_id

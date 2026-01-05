@@ -62,6 +62,7 @@ class DataManager {
     const duration = raw?.duration != null && String(raw.duration).trim() !== '' ? raw.duration : '';
     const cover = raw?.cover || raw?.cover_url || raw?.coverImage || raw?.cover_image || '';
     const audio = raw?.audio || raw?.audio_url || raw?.audioUrl || raw?.audio_url || '';
+    const language = raw?.language || raw?.genre || '';
 
     return {
       id,
@@ -69,6 +70,7 @@ class DataManager {
       artist,
       album,
       duration,
+      language: language != null ? String(language) : '',
       cover,
       audio,
       coverImage: cover,
