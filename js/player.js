@@ -549,6 +549,19 @@ class MusicPlayer {
   updateNowPlayingControls() {
     const btn = document.getElementById('np-play');
     if (!btn) return;
+
+    const prevBtn = document.getElementById('np-prev');
+    const nextBtn = document.getElementById('np-next');
+    const seek = document.getElementById('np-seek');
+
+    const hasSongs = Array.isArray(this.playlist) && this.playlist.length > 0;
+    const canControl = hasSongs && !!this.currentSong;
+
+    if (prevBtn) prevBtn.disabled = !canControl;
+    if (nextBtn) nextBtn.disabled = !canControl;
+    if (btn) btn.disabled = !canControl;
+    if (seek) seek.disabled = !canControl;
+
     btn.textContent = this.isPlaying ? '⏸' : '▶';
   }
 

@@ -28,19 +28,21 @@ class AudioVisualizer {
     
     // Sonic wave settings
     this.waveLayers = [
-      { amp: 1.0, thickness: 2.2, speed: 0.018, freq: 1.2, blur: 26, opacity: 0.85 },
-      { amp: 0.72, thickness: 1.8, speed: 0.024, freq: 1.75, blur: 18, opacity: 0.65 },
-      { amp: 0.5, thickness: 1.4, speed: 0.031, freq: 2.4, blur: 12, opacity: 0.45 }
+      { amp: 1.0, thickness: 2.6, speed: 0.016, freq: 1.05, blur: 30, opacity: 0.95 },
+      { amp: 0.86, thickness: 2.1, speed: 0.020, freq: 1.35, blur: 26, opacity: 0.78 },
+      { amp: 0.72, thickness: 1.7, speed: 0.026, freq: 1.75, blur: 22, opacity: 0.62 },
+      { amp: 0.58, thickness: 1.4, speed: 0.032, freq: 2.25, blur: 18, opacity: 0.48 },
+      { amp: 0.44, thickness: 1.1, speed: 0.040, freq: 2.9, blur: 14, opacity: 0.35 }
     ];
     this.pointStep = 6; // px between points (smaller = smoother but more CPU)
     this.baseAmplitude = 24; // px
     this.maxAmplitude = 92; // px
     
-    // Gradient colors (PicsArt style)
+    // Gradient colors (Neon Blue waveform)
     this.gradientColors = [
-      { r: 255, g: 0, b: 102 },    // #FF0066 - Hot Pink
-      { r: 245, g: 0, b: 143 },    // #F5008F - Magenta Pink
-      { r: 142, g: 45, b: 226 }    // #8E2DE2 - Purple
+      { r: 79, g: 195, b: 247 },   // #4FC3F7
+      { r: 33, g: 150, b: 243 },   // #2196F3
+      { r: 3, g: 169, b: 244 }     // #03A9F4
     ];
     
     // Initialize when DOM is ready
@@ -380,11 +382,11 @@ class AudioVisualizer {
     const amp = this.baseAmplitude + (this.maxAmplitude - this.baseAmplitude) * intensity;
     const softAlpha = this.alpha;
 
-    // Gradient stroke
+    // Neon blue gradient stroke
     const gradient = ctx.createLinearGradient(0, 0, width, 0);
-    gradient.addColorStop(0, `rgba(255, 0, 102, ${0.95 * softAlpha})`);
-    gradient.addColorStop(0.5, `rgba(245, 0, 143, ${0.95 * softAlpha})`);
-    gradient.addColorStop(1, `rgba(142, 45, 226, ${0.95 * softAlpha})`);
+    gradient.addColorStop(0, `rgba(79, 195, 247, ${0.95 * softAlpha})`);
+    gradient.addColorStop(0.55, `rgba(33, 150, 243, ${0.95 * softAlpha})`);
+    gradient.addColorStop(1, `rgba(3, 169, 244, ${0.95 * softAlpha})`);
 
     // Use additive blending for neon layering
     ctx.globalCompositeOperation = 'lighter';
@@ -419,18 +421,13 @@ class AudioVisualizer {
         else ctx.lineTo(x, y);
       }
 
-      // Glow settings per layer
+      // Glow settings per layer (beat-reactive)
       ctx.strokeStyle = gradient;
       ctx.lineWidth = layer.thickness;
       ctx.globalAlpha = layer.opacity * softAlpha;
-      ctx.shadowBlur = layer.blur;
-      ctx.shadowColor = `rgba(255, 0, 102, ${0.35 * softAlpha})`;
-      ctx.stroke();
-
-      // Subtle secondary stroke for crisper center line
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = (layer.opacity * 0.55) * softAlpha;
-      ctx.lineWidth = Math.max(1, layer.thickness * 0.75);
+      const glowBoost = 1 + (this.beat * 1.8);
+      ctx.shadowBlur = layer.blur * glowBoost;
+      ctx.shadowColor = `rgba(79, 195, 247, ${0.55 * softAlpha})`;
       ctx.stroke();
     }
 

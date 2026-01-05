@@ -1767,9 +1767,20 @@ img {
    width: 100%;
    height: 40%;
    z-index: 3;
-   opacity: 0.35;
+   opacity: 1;
    pointer-events: none;
    display: block;
+ }
+
+ .sonic-wave-canvas {
+   position: absolute;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   height: 40%;
+   z-index: 3;
+   opacity: 1;
+   pointer-events: none;
  }
 
  .sonic-waves.active {
@@ -1785,6 +1796,11 @@ img {
    font-weight: 800;
    color: #ffffff;
    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+ }
+
+ .np-btn:disabled {
+   opacity: 0.4;
+   cursor: not-allowed;
  }
 
  .now-playing-artist {

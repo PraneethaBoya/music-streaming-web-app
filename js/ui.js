@@ -137,7 +137,7 @@ class UIManager {
     if (!container) return;
 
     if (songs.length === 0) {
-      container.innerHTML = '<p class="loading">No songs found</p>';
+      container.innerHTML = '<p class="loading">No songs available</p>';
       return;
     }
 
@@ -153,7 +153,7 @@ class UIManager {
     if (!container) return;
 
     if (songs.length === 0) {
-      container.innerHTML = '<p class="loading">No songs found</p>';
+      container.innerHTML = '<p class="loading">No songs available</p>';
       return;
     }
 
