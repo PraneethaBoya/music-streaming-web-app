@@ -524,6 +524,140 @@ app.post('/api/upload/song', (req, res) => {
   });
 });
 
+app.post('/api/albums', (req, res) => {
+  if (!ensureDb(res)) return;
+
+  coverUpload.single('cover')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ error: err.message || 'Invalid form data' });
+    }
+
+    const name = req.body?.name != null ? String(req.body.name).trim() : '';
+    const artist = req.body?.artist != null ? String(req.body.artist).trim() : '';
+    const yearRaw = req.body?.year != null ? String(req.body.year).trim() : '';
+    const songIdsRaw = req.body?.songIds != null ? String(req.body.songIds).trim() : '';
+
+    if (!name) return res.status(400).json({ error: 'Album name is required' });
+    if (!artist) return res.status(400).json({ error: 'Artist name is required' });
+
+    const coverUrl = req.file ? `/uploads/covers/${req.file.filename}` : null;
+
+    let releaseDate = null;
+    if (yearRaw) {
+      const yearNum = Number(yearRaw);
+      if (!Number.isFinite(yearNum) || yearNum < 1900 || yearNum > 2099) {
+        return res.status(400).json({ error: 'Invalid release year' });
+      }
+      releaseDate = `${String(yearNum).padStart(4, '0')}-01-01`;
+    }
+
+    let songIds = [];
+    if (songIdsRaw) {
+      try {
+        const parsed = JSON.parse(songIdsRaw);
+        if (Array.isArray(parsed)) songIds = parsed.map(v => String(v)).filter(Boolean);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid songIds payload' });
+      }
+    }
+
+    let client;
+    try {
+      client = await pool.connect();
+      await client.query('BEGIN');
+
+      const artistResult = await client.query(
+        'INSERT INTO artists (name, image_url) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name, image_url',
+        [artist, DEFAULT_ARTIST_IMAGE]
+      );
+      const artistRow = artistResult.rows[0];
+
+      const existingAlbum = await client.query(
+        'SELECT id, title, cover_url, release_date FROM albums WHERE artist_id = $1 AND lower(title) = lower($2) LIMIT 1',
+        [artistRow.id, name]
+      );
+
+      let albumRow;
+      if (existingAlbum.rows.length > 0) {
+        albumRow = existingAlbum.rows[0];
+        if (coverUrl && (!albumRow.cover_url || String(albumRow.cover_url).trim() === '')) {
+          const updated = await client.query(
+            'UPDATE albums SET cover_url = $1 WHERE id = $2 RETURNING id, title, cover_url, release_date',
+            [coverUrl, albumRow.id]
+          );
+          if (updated.rows.length > 0) albumRow = updated.rows[0];
+        }
+      } else {
+        const createdAlbum = await client.query(
+          'INSERT INTO albums (title, artist_id, cover_url, release_date) VALUES ($1, $2, $3, $4) RETURNING id, title, cover_url, release_date',
+          [name, artistRow.id, coverUrl, releaseDate]
+        );
+        albumRow = createdAlbum.rows[0];
+      }
+
+      let assigned = 0;
+      if (songIds.length > 0) {
+        const songsRes = await client.query(
+          'SELECT id, artist_id FROM songs WHERE id = ANY($1::uuid[]) FOR UPDATE',
+          [songIds]
+        );
+
+        const foundIds = new Set(songsRes.rows.map(r => String(r.id)));
+        const missing = songIds.filter(id => !foundIds.has(String(id)));
+        if (missing.length > 0) {
+          await client.query('ROLLBACK');
+          return res.status(400).json({ error: 'Some selected songs were not found', missingSongIds: missing });
+        }
+
+        const wrongArtist = songsRes.rows
+          .filter(r => String(r.artist_id) !== String(artistRow.id))
+          .map(r => String(r.id));
+
+        if (wrongArtist.length > 0) {
+          await client.query('ROLLBACK');
+          return res.status(400).json({ error: 'Selected songs must belong to the album artist', wrongArtistSongIds: wrongArtist });
+        }
+
+        const updateRes = await client.query(
+          'UPDATE songs SET album_id = $1 WHERE id = ANY($2::uuid[])',
+          [albumRow.id, songIds]
+        );
+        assigned = updateRes.rowCount || 0;
+      }
+
+      await client.query('COMMIT');
+
+      res.status(201).json({
+        message: 'Album created successfully',
+        artist: {
+          id: artistRow.id,
+          name: artistRow.name,
+          image: artistRow.image_url || ''
+        },
+        album: {
+          id: albumRow.id,
+          title: albumRow.title,
+          cover: albumRow.cover_url || '',
+          releaseDate: albumRow.release_date ? String(albumRow.release_date) : ''
+        },
+        assignedSongs: assigned
+      });
+    } catch (e) {
+      try {
+        if (client) await client.query('ROLLBACK');
+      } catch (rollbackErr) {
+      }
+      console.error('Error creating album:', e);
+      res.status(500).json({ error: e?.message ? String(e.message) : 'Failed to create album' });
+    } finally {
+      try {
+        if (client) client.release();
+      } catch (e) {
+      }
+    }
+  });
+});
+
 // ============================================
 // Authentication Routes
 // ============================================

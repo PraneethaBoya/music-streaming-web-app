@@ -145,17 +145,36 @@
     });
 
     // Handle form submission
-    document.getElementById('create-album-form').addEventListener('submit', (e) => {
+    document.getElementById('create-album-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const albumName = formData.get('name');
       const selectedSongs = Array.from(document.getElementById('album-songs').selectedOptions).map(opt => opt.value);
-      
-      // In a real app, you'd send this to a backend
-      alert(`Album "${albumName}" created successfully with ${selectedSongs.length} songs! (This is a demo - no backend integration)`);
-      
-      // Redirect to library
-      window.location.href = 'library.html';
+
+      try {
+        const apiBaseUrl = (typeof window !== 'undefined' && window.API_BASE_URL)
+          ? window.API_BASE_URL
+          : `${window.location.origin}/api`;
+
+        formData.append('songIds', JSON.stringify(selectedSongs));
+
+        const res = await fetch(`${apiBaseUrl}/albums`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const payload = await res.json().catch(() => null);
+        if (!res.ok) {
+          const msg = payload?.error ? String(payload.error) : 'Failed to create album';
+          alert(msg);
+          return;
+        }
+
+        alert(`Album "${albumName}" created successfully with ${payload?.assignedSongs ?? selectedSongs.length} songs!`);
+        window.location.href = 'library.html';
+      } catch (err) {
+        alert(err?.message ? String(err.message) : 'Failed to create album');
+      }
     });
   </script>
 </body>
