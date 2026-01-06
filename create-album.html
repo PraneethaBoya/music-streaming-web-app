@@ -57,14 +57,14 @@
             <div class="form-group">
               <label for="album-cover">Album Cover</label>
               <input type="file" id="album-cover" name="cover" accept="image/*" required>
-              <small style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: block;">Recommended: 300x300px or larger</small>
+              <small style="margin-top: var(--spacing-xs); display: block;">Recommended: 300x300px or larger</small>
             </div>
             <div class="form-group">
               <label for="album-songs">Select Songs</label>
-              <select id="album-songs" name="songs" multiple style="width: 100%; padding: var(--spacing-md); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); font-size: var(--font-size-base); font-family: inherit; min-height: 120px;">
+              <select id="album-songs" name="songs" multiple style="width: 100%; padding: var(--spacing-md); background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-primary); min-height: 120px;">
                 <option value="" disabled>Select songs for your album (Hold Ctrl/Cmd to select multiple)</option>
               </select>
-              <small style="color: var(--text-secondary); font-size: var(--font-size-sm); margin-top: var(--spacing-xs); display: block;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple songs</small>
+              <small style="margin-top: var(--spacing-xs); display: block;">Hold Ctrl (Windows) or Cmd (Mac) to select multiple songs</small>
             </div>
             <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: var(--spacing-md);">Create Album</button>
           </form>

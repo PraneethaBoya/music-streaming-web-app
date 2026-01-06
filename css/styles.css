@@ -50,6 +50,10 @@
   
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
   --font-size-xs: 0.75rem;
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -99,8 +103,13 @@ body {
   font-family: var(--font-family);
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  line-height: 1.6;
+  line-height: 1.5;
   overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
 }
 
 a {
@@ -766,7 +775,7 @@ img {
 
 .song-card-title {
   font-size: var(--font-size-base);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-xs);
   color: var(--text-primary);
   white-space: nowrap;
@@ -777,9 +786,33 @@ img {
 .song-card-artist {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.brand-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-4xl: 2.5rem;
+    --font-size-3xl: 1.75rem;
+    --font-size-2xl: 1.375rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --font-size-4xl: 2.25rem;
+    --font-size-3xl: 1.625rem;
+    --font-size-xl: 1.125rem;
+  }
 }
 
 .song-list {
@@ -851,21 +884,24 @@ img {
 }
 
 .song-list-title {
-  font-size: var(--font-size-base);
-  font-weight: 500;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-xs);
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .song-list-artist {
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .song-list-duration {
@@ -917,7 +953,7 @@ img {
 
 .artist-name {
   font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   margin-bottom: var(--spacing-xs);
 }
 
@@ -1195,6 +1231,28 @@ img {
   border: 1px solid var(--border-color);
 }
 
+ .reset-success {
+   text-align: center;
+ }
+
+ .reset-success-icon {
+   font-size: 2rem;
+   margin-bottom: var(--spacing-md);
+   line-height: 1;
+ }
+
+ .reset-success-title {
+   font-weight: var(--font-weight-semibold);
+   margin-bottom: var(--spacing-sm);
+   line-height: 1.4;
+ }
+
+ .reset-success-subtitle {
+   font-size: var(--font-size-sm);
+   color: var(--text-secondary);
+   line-height: 1.5;
+ }
+
 .auth-card h1 {
   font-size: var(--font-size-3xl);
   font-weight: 700;
@@ -1391,6 +1449,15 @@ img {
   object-fit: cover;
 }
 
+.playlist-header-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-4xl);
+  line-height: 1;
+  background: linear-gradient(135deg, #450a0a 0%, #7f1d1d 100%);
+}
+
 .playlist-header-info {
   flex: 1;
   padding-bottom: var(--spacing-md);
@@ -1398,14 +1465,14 @@ img {
 
 .playlist-header-type {
   font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
   text-transform: uppercase;
   margin-bottom: var(--spacing-sm);
 }
 
 .playlist-header-title {
   font-size: var(--font-size-4xl);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   margin-bottom: var(--spacing-md);
   line-height: 1.2;
 }
@@ -1429,6 +1496,10 @@ img {
   gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
+
+ .playlist-actions .btn.play-pause {
+   font-size: var(--font-size-xl);
+ }
 
 /* ============================================
    Responsive Design
@@ -1811,9 +1882,10 @@ img {
 
  .now-playing-title {
    font-size: 22px;
-   font-weight: 800;
+   font-weight: var(--font-weight-bold);
    color: #ffffff;
    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+   line-height: 1.3;
  }
 
  .np-btn:disabled {
@@ -1825,6 +1897,8 @@ img {
    margin-top: 6px;
    color: rgba(255, 255, 255, 0.85);
    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+   font-weight: var(--font-weight-medium);
+   line-height: 1.4;
  }
 
  .now-playing-controls {
