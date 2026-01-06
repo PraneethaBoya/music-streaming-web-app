@@ -26,22 +26,33 @@ CREATE TABLE IF NOT EXISTS artists (
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_artists_name_unique ON artists(name);
 
+-- Prevent blank names
+ALTER TABLE artists
+  ADD CONSTRAINT IF NOT EXISTS artists_name_not_blank CHECK (length(btrim(name)) > 0);
+
 -- Albums Table
 CREATE TABLE IF NOT EXISTS albums (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
-    artist_id UUID REFERENCES artists(id) ON DELETE CASCADE,
+    artist_id UUID NOT NULL REFERENCES artists(id) ON DELETE CASCADE,
     cover_url TEXT,
     release_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Prevent blank titles and duplicate album names per artist
+ALTER TABLE albums
+  ADD CONSTRAINT IF NOT EXISTS albums_title_not_blank CHECK (length(btrim(title)) > 0);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_albums_artist_title_unique
+  ON albums(artist_id, lower(title));
+
 -- Songs Table
 CREATE TABLE IF NOT EXISTS songs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
-    artist_id UUID REFERENCES artists(id) ON DELETE CASCADE,
-    album_id UUID REFERENCES albums(id) ON DELETE SET NULL,
+    artist_id UUID NOT NULL REFERENCES artists(id) ON DELETE CASCADE,
+    album_id UUID NOT NULL REFERENCES albums(id) ON DELETE CASCADE,
     duration INTEGER, -- Duration in seconds
     audio_url TEXT NOT NULL,
     cover_url TEXT,
@@ -49,6 +60,10 @@ CREATE TABLE IF NOT EXISTS songs (
     play_count INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Prevent blank song titles
+ALTER TABLE songs
+  ADD CONSTRAINT IF NOT EXISTS songs_title_not_blank CHECK (length(btrim(title)) > 0);
 
 -- Playlists Table
 CREATE TABLE IF NOT EXISTS playlists (

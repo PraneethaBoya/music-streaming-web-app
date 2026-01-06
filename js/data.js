@@ -208,9 +208,9 @@ class DataManager {
    * Get artist by ID
    */
   getArtistById(id) {
-    const key = id != null ? Number(id) : null;
+    const key = id != null ? String(id) : '';
     const catalog = this.getCatalog();
-    const found = catalog.find(a => Number(a.artistId) === key);
+    const found = catalog.find(a => String(a.artistId) === key);
     if (!found) return null;
     return {
       id: found.artistId,
@@ -247,9 +247,9 @@ class DataManager {
    * Get album by ID
    */
   getAlbumById(id) {
-    const key = id != null ? Number(id) : null;
+    const key = id != null ? String(id) : '';
     const albums = this.getAlbums();
-    return albums.find(a => Number(a.id) === key);
+    return albums.find(a => String(a.id) === key);
   }
 
   /**

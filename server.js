@@ -433,60 +433,93 @@ app.post('/api/upload/song', (req, res) => {
     const coverUrl = coverFile ? `/uploads/covers/${coverFile.filename}` : null;
     const artistImageUrl = artistPhotoFile ? `/uploads/artists/${artistPhotoFile.filename}` : null;
 
-    try {
-      const artistName = String(artist).trim();
-      const albumTitle = (album ? String(album).trim() : '') || 'Singles';
+    const artistName = String(artist).trim();
+    const rawAlbum = album != null ? String(album).trim() : '';
+    const albumTitle = rawAlbum !== '' ? rawAlbum : 'Singles';
+    const songTitle = String(title).trim();
 
-      const artistResult = await pool.query(
+    if (!artistName) return res.status(400).json({ error: 'Artist name cannot be empty' });
+    if (!songTitle) return res.status(400).json({ error: 'Song title cannot be empty' });
+    if (!albumTitle) return res.status(400).json({ error: 'Album name cannot be empty' });
+
+    let client;
+    try {
+      client = await pool.connect();
+      await client.query('BEGIN');
+
+      const artistResult = await client.query(
         'INSERT INTO artists (name, image_url) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name RETURNING id, name, image_url',
         [artistName, artistImageUrl || DEFAULT_ARTIST_IMAGE]
       );
       let artistRow = artistResult.rows[0];
 
       if ((!artistRow.image_url || String(artistRow.image_url).trim() === '') && (artistImageUrl || DEFAULT_ARTIST_IMAGE)) {
-        const updatedArtist = await pool.query(
+        const updatedArtist = await client.query(
           'UPDATE artists SET image_url = $1 WHERE id = $2 RETURNING id, name, image_url',
           [artistImageUrl || DEFAULT_ARTIST_IMAGE, artistRow.id]
         );
         if (updatedArtist.rows.length > 0) artistRow = updatedArtist.rows[0];
       }
 
-      let albumId = null;
-      const existingAlbum = await pool.query(
-        'SELECT id, title FROM albums WHERE title = $1 AND artist_id = $2 LIMIT 1',
+      // Create/find album once per artist+title (DB unique index enforces this too)
+      const existingAlbum = await client.query(
+        'SELECT id, title FROM albums WHERE lower(title) = lower($1) AND artist_id = $2 LIMIT 1',
         [albumTitle, artistRow.id]
       );
+
+      let albumRow;
       if (existingAlbum.rows.length > 0) {
-        albumId = existingAlbum.rows[0].id;
+        albumRow = existingAlbum.rows[0];
       } else {
-        const createdAlbum = await pool.query(
+        const createdAlbum = await client.query(
           'INSERT INTO albums (title, artist_id) VALUES ($1, $2) RETURNING id, title',
           [albumTitle, artistRow.id]
         );
-        albumId = createdAlbum.rows[0].id;
+        albumRow = createdAlbum.rows[0];
       }
 
-      const songResult = await pool.query(
+      const songResult = await client.query(
         'INSERT INTO songs (title, artist_id, album_id, audio_url, cover_url, created_at) VALUES ($1, $2, $3, $4, $5, NOW()) RETURNING id, title, audio_url, cover_url',
-        [String(title).trim(), artistRow.id, albumId, audioUrl, coverUrl]
+        [songTitle, artistRow.id, albumRow.id, audioUrl, coverUrl]
       );
+
+      await client.query('COMMIT');
 
       const songRow = songResult.rows[0];
       res.status(201).json({
         message: 'Song uploaded successfully',
+        artist: {
+          id: artistRow.id,
+          name: artistRow.name,
+          image: artistRow.image_url || ''
+        },
+        album: {
+          id: albumRow.id,
+          title: albumRow.title
+        },
         song: {
           id: songRow.id,
           title: songRow.title,
           artist: artistRow.name,
-          album: albumTitle || '',
+          album: albumRow.title || '',
           duration: null,
           cover: songRow.cover_url,
           audio: songRow.audio_url
         }
       });
     } catch (e) {
+      try {
+        if (client) await client.query('ROLLBACK');
+      } catch (rollbackErr) {
+      }
+
       console.error('Error saving uploaded song:', e);
-      res.status(500).json({ error: 'Failed to save song metadata' });
+      res.status(500).json({ error: e?.message ? String(e.message) : 'Failed to save song metadata' });
+    } finally {
+      try {
+        if (client) client.release();
+      } catch (e) {
+      }
     }
   });
 });
@@ -643,31 +676,12 @@ app.get('/api/catalog', async (req, res) => {
     const artistOrder = [];
     const artistMap = new Map();
     const albumMapByArtist = new Map();
-    const artistNumericIdByUuid = new Map();
-    const albumNumericIdByUuid = new Map();
-    const songNumericIdByUuid = new Map();
-
-    const getArtistNumericId = (uuid) => {
-      if (!uuid) return null;
-      if (!artistNumericIdByUuid.has(uuid)) artistNumericIdByUuid.set(uuid, artistNumericIdByUuid.size + 1);
-      return artistNumericIdByUuid.get(uuid);
-    };
-    const getAlbumNumericId = (uuid) => {
-      if (!uuid) return null;
-      if (!albumNumericIdByUuid.has(uuid)) albumNumericIdByUuid.set(uuid, albumNumericIdByUuid.size + 1);
-      return albumNumericIdByUuid.get(uuid);
-    };
-    const getSongNumericId = (uuid) => {
-      if (!uuid) return null;
-      if (!songNumericIdByUuid.has(uuid)) songNumericIdByUuid.set(uuid, songNumericIdByUuid.size + 1);
-      return songNumericIdByUuid.get(uuid);
-    };
 
     for (const row of result.rows) {
       const artistUuid = row.artist_id;
       if (!artistMap.has(artistUuid)) {
         artistMap.set(artistUuid, {
-          artistId: getArtistNumericId(artistUuid),
+          artistId: artistUuid,
           artistName: row.artist_name || '',
           artistImage: row.artist_image || '',
           albums: []
@@ -680,7 +694,7 @@ app.get('/api/catalog', async (req, res) => {
       const albumUuid = row.album_id;
       if (albumUuid && !artistAlbumsMap.has(albumUuid)) {
         const albumObj = {
-          albumId: getAlbumNumericId(albumUuid),
+          albumId: albumUuid,
           albumName: row.album_name || '',
           albumCover: row.album_cover || '',
           songs: []
@@ -693,7 +707,7 @@ app.get('/api/catalog', async (req, res) => {
         const albumObj = artistAlbumsMap.get(albumUuid);
         if (albumObj) {
           albumObj.songs.push({
-            songId: getSongNumericId(row.song_id),
+            songId: row.song_id,
             title: row.song_title || '',
             duration: row.song_duration != null ? String(row.song_duration) : '',
             audioUrl: row.audio_url || '',
