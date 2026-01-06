@@ -120,6 +120,26 @@ class DataManager {
     return songs;
   }
 
+  getSongsByAlbumId(albumId) {
+    const key = albumId != null ? String(albumId) : '';
+    if (!key) return [];
+
+    const catalog = this.getCatalog();
+    const songs = [];
+    for (const artist of catalog) {
+      const albums = Array.isArray(artist?.albums) ? artist.albums : [];
+      for (const album of albums) {
+        const aId = album?.albumId != null ? String(album.albumId) : '';
+        if (aId !== key) continue;
+        const albumSongs = Array.isArray(album?.songs) ? album.songs : [];
+        for (const song of albumSongs) {
+          songs.push(this.buildLegacySongFromCatalog(artist, album, song));
+        }
+      }
+    }
+    return songs;
+  }
+
   /**
    * Load music data from JSON file
    */

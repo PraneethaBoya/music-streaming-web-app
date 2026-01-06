@@ -146,7 +146,7 @@
             <img src="${album.cover}" alt="${album.title}" class="song-card-image">
             <div class="play-overlay">
               <button class="play-album-btn" data-album-id="${album.id}">
-                <i class="icon-play">▶️</i>
+                <i class="icon-play"></i>
               </button>
             </div>
           </div>
@@ -155,6 +155,32 @@
         </div>
       `).join('');
       document.getElementById('user-albums').innerHTML = albumsHtml || '<p class="loading">No albums yet</p>';
+
+      // Album play handlers
+      const albumsContainer = document.getElementById('user-albums');
+      if (albumsContainer) {
+        albumsContainer.querySelectorAll('.play-album-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const albumId = btn.getAttribute('data-album-id');
+            const songs = dataManager.getSongsByAlbumId(albumId);
+            if (!songs || songs.length === 0) return;
+            await musicPlayer.loadSong(songs[0], songs);
+            if (!musicPlayer.isPlaying) await musicPlayer.play();
+          });
+        });
+
+        albumsContainer.querySelectorAll('.song-card[data-album-id]').forEach(card => {
+          card.addEventListener('click', async (e) => {
+            if (e.target.closest('.play-overlay')) return;
+            const albumId = card.getAttribute('data-album-id');
+            const songs = dataManager.getSongsByAlbumId(albumId);
+            if (!songs || songs.length === 0) return;
+            await musicPlayer.loadSong(songs[0], songs);
+            if (!musicPlayer.isPlaying) await musicPlayer.play();
+          });
+        });
+      }
       
       // Show all artists
       const artists = dataManager.getArtists();
